@@ -1,0 +1,21 @@
+{
+  "name": "inlum.in",
+  "version": "1.0.0",
+  "description": "demo",
+  "main": "webgl.js",
+  "scripts": {
+    "server": "http-server ./demo",
+    "watch": "chokidar-socket-emitter -p demo",
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run watch\""
+  },
+  "keywords": [
+    "demo"
+  ],
+  "author": "Leon Denise",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.3.0",
+    "concurrently": "^4.1.2",
+    "socket.io-client": "^2.3.0"
+  }
+}
