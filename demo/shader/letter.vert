@@ -2,6 +2,7 @@ precision mediump float;
 
 attribute vec3 position, anchor, quantity, uv;
 
+uniform sampler2D buffermap, datamap;
 uniform mat4 viewProjection;
 uniform float time;
 uniform vec2 resolution;
@@ -27,18 +28,25 @@ void main () {
 	vec2 pivot = anchor.xy;
 
 	pos = vec3(0);
-	pos.x += (uv.z*2.-1.)*.5;
-	float wave = abs(sin(time + pos.x));
-	pivot *= rotation(pos.x + time + PI/2.);
-	pivot.x *= 1.+.5*smoothstep(0.1,0.0,wave);
-	pos.y += wave;
+	vec4 data = texture2D(buffermap, vec2(uv.z,0));
+	pos = data.xyz;
+	float range = 1.;
+	// pos.x += (uv.z*2.-1.)*range;
+	float x = pos.x / 2. / range;
+	float wave = abs(sin(time - x));
+	// pivot *= rotation((wave*2.-1.)*PI);
+	// pivot.x *= 1.+.5*smoothstep(0.1,0.0,wave);
+	// pos.y += (pow(wave, .5)*2.-1.)/2.;
 	// pos = curve(uv.z*1.);
+	float fade = 1.0;
+	fade *= smoothstep(0.0, 0.1, data.w);
+
 
 	float distCam = length(camera-pos);
 	vec3 forward = normalize(camera-pos);
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.2;
+	float radius = 0.1 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
 	pos += (pivot.x * right + pivot.y * up) * radius;

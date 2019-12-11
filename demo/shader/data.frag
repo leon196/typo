@@ -1,15 +1,15 @@
 precision mediump float;
 
-uniform sampler2D frame, frameBlur, fontmap, buffermap, datamap;
+uniform float time;
 uniform vec2 resolution;
-uniform float time, fade;
+uniform sampler2D buffermap, datamap;
 
 varying vec2 texcoord;
 
-const float PI = 3.14159;
-const float TAU = 6.28318;
-#define lod(p,r) (floor(p*r)/r)
+const float PI = 3.1415;
+const float TAU = 6.283;
 
+mat2 rotation (float a) { float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
 float random(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
 float hash(vec3 p) { p  = fract( p*0.3183099+.1 ); p *= 17.0; return fract( p.x*p.y*p.z*(p.x+p.y+p.z) ); }
 float noise( in vec3 x ) {
@@ -43,14 +43,21 @@ float fbm (vec3 p, float falloff) {
 
 void main() {
 	vec2 uv = texcoord;
-	vec2 p = (uv*2.-1.)*vec2(resolution.x/resolution.y,1.);
-	vec4 blur = texture2D(frameBlur, vec2(uv.x,1.-uv.y));
-	float dither = random(uv);
-	vec4 background = vec4(0);
-	background.rgb = mix(vec3(1.,0.1,0.2), vec3(0.9,0.8, 1.0), uv.y+20.*dither/resolution.y);
-	float blend = smoothstep(0.,1.,length(p));
-	gl_FragColor = background + texture2D(frame, uv);
-	// gl_FragColor = abs(mix(texture2D(buffermap, uv), texture2D(datamap, uv), step(0.5,uv.y)));
-	// gl_FragColor = mix(gl_FragColor, blur, blend);
-	// gl_FragColor = blur;
+	vec4 data = texture2D(buffermap, uv);
+	vec3 target = texture2D(datamap, uv).xyz;
+	vec3 pos = data.xyz;
+	float elapsed = data.w;
+	vec3 seed = pos + target;
+	seed.xz *= rotation(time*.1);
+	seed.yz *= rotation(time*.1);
+	vec3 curl = (vec3(
+		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
+		)*2.-1.);
+	// pos += normalize(-pos) * smoothstep(0.1, 0.3, length(pos)) * 0.1;
+	pos += curl * 0.1;
+	elapsed += .001;
+	pos = mix(pos, vec3(0), step(1.0, elapsed));
+	elapsed = fract(elapsed);
+	gl_FragColor = vec4(pos, elapsed);
+	// gl_FragColor = texture2D(datamap, uv);
 }

@@ -18,7 +18,7 @@ loadFiles('data/',['eye.ply'], "arraybuffer", function(plys) {
 	})
 
 // shaders file to load
-loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag', 'letter.vert', 'letter.frag'], "text", function(shaders) {
+loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag', 'letter.vert', 'letter.frag', 'data.frag'], "text", function(shaders) {
 	var uniforms = {};
 
 	var materials = {};
@@ -27,6 +27,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		'quad': 			['quad.vert', 			'circle.frag'],
 		'letter': 		['letter.vert', 		'letter.frag'],
 		'blur': 			['screen.vert', 		'blur.frag'],
+		'data': 			['screen.vert', 		'data.frag'],
 		'screen': 		['screen.vert', 		'screen.frag'] };
 
 	loadMaterials();
@@ -44,7 +45,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var column = 6;
 	var row = 6;
-	var text = "SALUT";
+	var text = "SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT";
 	for (var i = 0; i < text.length; i++) {
 		var index = alphabet.indexOf(text[i]);
 		var x = (index%column)/column;
@@ -60,7 +61,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	// camera
 	var projection = m4.identity();
 	var camera = m4.identity();
-	var cameraDistance = 3;
+	var cameraDistance = 5;
 	var cameraAngle = [0,0];
 	var fieldOfView = 60;
 
@@ -70,6 +71,30 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	var frameBlurA = twgl.createFramebufferInfo(gl);
 	var frameBlurB = twgl.createFramebufferInfo(gl);
 	var frameToResize = [frame,frameScreen,frameBlurA,frameBlurB];
+
+	var frameDataBuffer = [];
+	var currentFrameData = 0;
+	var array = [];
+	for (var i = 0; i < text.length; ++i) array.push(positions[i*3], positions[i*3+1], positions[i*3+2], 1)
+	var frameAttachments = [{
+		mag: gl.NEAREST,
+		min: gl.NEAREST,
+		type: gl.FLOAT,
+		format: gl.RGBA,
+	}];
+	for (var i = 0; i < 2; ++i) frameDataBuffer.push(twgl.createFramebufferInfo(gl, frameAttachments, text.length,1));
+
+	// for (var i = 0; i < 2; ++i) twgl.resizeFramebufferInfo(gl, frameDataBuffer[i], frameAttachments, text.length, 1);
+
+	uniforms.datamap = twgl.createTexture(gl, {
+		mag: gl.NEAREST,
+		min: gl.NEAREST,
+		type: gl.FLOAT,
+		format: gl.RGBA,
+		width: text.length,
+		height: 1,
+		src: new Float32Array(array),
+	})
 
 	var fontsize = 200; // Font size in pixels
 	var buffer = 600;    // Whitespace buffer around a glyph in pixels
@@ -110,6 +135,15 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		uniforms.viewProjection = m4.multiply(projection, m4.inverse(camera));
 		uniforms.camera = m4.getTranslation(camera);
 
+		uniforms.buffermap = frameDataBuffer[currentFrameData].attachments[0];
+		currentFrameData = (currentFrameData+1)%2;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameDataBuffer[currentFrameData].framebuffer);
+		gl.clearColor(0,0,0,0);
+		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+		gl.viewport(0, 0, text.length, 1);
+		draw(materials['data'], geometryQuad, gl.TRIANGLES);
+		// drawFrame(materials['data'], frameDataBuffer[currentFrameData].framebuffer);
+
 		// render scene
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frame.framebuffer);
   	// gl.enable(gl.DEPTH_TEST);
@@ -135,7 +169,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 			else uniforms.frame = readBuffer.attachments[0];
 			uniforms.flip = true;
 			uniforms.direction = i % 2 === 0 ? [radius, 0] : [0, radius];
-			drawFrame(materials['blur'], geometryQuad, writeBuffer.framebuffer);
+			drawFrame(materials['blur'], writeBuffer.framebuffer);
 			var t = writeBuffer;
 			writeBuffer = readBuffer;
 			readBuffer = t;
@@ -144,16 +178,16 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		// final composition
 		uniforms.frame = frame.attachments[0];
 		uniforms.frameBlur = writeBuffer.attachments[0];
-		drawFrame(materials['screen'], geometryQuad, null);
+		drawFrame(materials['screen'], null);
 
 		requestAnimationFrame(render);
 	}
-	function drawFrame(shader, geometry, frame) {
+	function drawFrame(shader, frame) {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frame);
-		gl.clearColor(0,0,0,1);
+		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		draw(shader, geometry, gl.TRIANGLES);
+		draw(shader, geometryQuad, gl.TRIANGLES);
 	}
 	function draw(shader, geometry, mode) {
 		gl.useProgram(shader.program);
