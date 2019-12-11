@@ -2,6 +2,7 @@
 // shaderland
 
 window.onload = function() {
+
 var gl = document.getElementById('canvas').getContext('webgl');
 var ext = gl.getExtension('OES_texture_float');
 var v3 = twgl.v3;
@@ -17,13 +18,14 @@ loadFiles('data/',['eye.ply'], "arraybuffer", function(plys) {
 	})
 
 // shaders file to load
-loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag'], "text", function(shaders) {
+loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag', 'letter.vert', 'letter.frag'], "text", function(shaders) {
 	var uniforms = {};
 
 	var materials = {};
 	var materialMap = {
 		'point': 			['point.vert', 			'color.frag'],
 		'quad': 			['quad.vert', 			'circle.frag'],
+		'letter': 		['letter.vert', 		'letter.frag'],
 		'blur': 			['screen.vert', 		'blur.frag'],
 		'screen': 		['screen.vert', 		'screen.frag'] };
 
@@ -36,13 +38,29 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		attributes[name] = { data: attributes[name], numComponents:3 };
 	});
 	var geometry = twgl.createBufferInfoFromArrays(gl, attributes);
+
+	var positions = [];
+	var uvs = [];
+	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	var column = 6;
+	var row = 6;
+	var text = "SALUT";
+	for (var i = 0; i < text.length; i++) {
+		var index = alphabet.indexOf(text[i]);
+		var x = (index%column)/column;
+		var y = Math.floor(index/column)/row;
+		positions.push(Math.random()*2.-1., Math.random()*2.-1., Math.random()*2.-1.);
+		uvs.push(x, y, i/(text.length-1));
+	}
+	attributes = generateParticles({ position: positions, uv: uvs })[0];
+	var geometryLetter = twgl.createBufferInfoFromArrays(gl, attributes);
 	var geometryQuad = twgl.createBufferInfoFromArrays(gl, {
 		position:[-1,-1,0,1,-1,0,-1,1,0,-1,1,0,1,-1,0,1,1,0] });
 
 	// camera
 	var projection = m4.identity();
 	var camera = m4.identity();
-	var cameraDistance = 4;
+	var cameraDistance = 3;
 	var cameraAngle = [0,0];
 	var fieldOfView = 60;
 
@@ -52,6 +70,23 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	var frameBlurA = twgl.createFramebufferInfo(gl);
 	var frameBlurB = twgl.createFramebufferInfo(gl);
 	var frameToResize = [frame,frameScreen,frameBlurA,frameBlurB];
+
+	var fontsize = 200; // Font size in pixels
+	var buffer = 600;    // Whitespace buffer around a glyph in pixels
+	var radius = 4;    // How many pixels around the glyph shape to use for encoding distance
+	var cutoff = 0.0  // How much of the radius (relative) is used for the inside part the glyph
+
+	var fontFamily = 'Nunito'; // css font-family
+	var fontWeight = 'normal';     // css font-weight
+	var tinySDFGenerator = new TinySDF(fontsize, buffer, radius, cutoff, fontFamily, fontWeight);
+
+	uniforms.fontmap = twgl.createTexture(gl, {
+		mag:gl.NEAREST,
+		min:gl.LINEAR,
+		format: gl.LUMINANCE,
+		// flipY: true,
+		src:tinySDFGenerator.grid(alphabet, column, row)
+	});
 
 	var timeElapsed = 0;
 	uniforms.time = 0;
@@ -77,12 +112,18 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 
 		// render scene
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frame.framebuffer);
-  	gl.enable(gl.DEPTH_TEST);
+  	// gl.enable(gl.DEPTH_TEST);
+		// gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.clearColor(0,0,0,1);
-		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+		// gl.colorMask(false, false, false, true);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.depthMask(false);
+  	gl.enable(gl.BLEND);
+		gl.blendFunc(gl.ONE, gl.ONE);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-		draw(materials['quad'], geometry);
+		// draw(materials['quad'], geometry);
+		draw(materials['letter'], geometryLetter);
 
 		// gaussian blur
 		var iterations = 8;

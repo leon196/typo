@@ -1,6 +1,6 @@
 precision mediump float;
 
-uniform sampler2D frame, frameBlur;
+uniform sampler2D frame, frameBlur, fontmap;
 uniform vec2 resolution;
 uniform float time, fade;
 
