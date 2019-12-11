@@ -47,9 +47,13 @@ void main() {
 	vec3 target = texture2D(datamap, uv).xyz;
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
+	float variation = random(uv+vec2(.8946));
+	vec3 follow = vec3(sin(uv.x*TAU),cos(uv.x*TAU),0)*2.;
+	follow.xz *= rotation(time*.2);
+	follow.yz *= rotation(time*.2);
 	pos += texture2D(velocitymap, uv).xyz;
-	elapsed += .001;
-	pos = mix(pos, vec3(0), step(1.0, elapsed));
+	elapsed += .001 + .02 * variation;
+	pos = mix(pos, follow, step(1.0, elapsed));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);
 }

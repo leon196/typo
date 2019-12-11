@@ -56,15 +56,17 @@ void main() {
 	// curl.y *= 0.1;
 	float variation = random(uv+vec2(.123));
 	float friction = 0.95 + 0.045 * variation;
-	float speed = 0.01;
+	float speed = 0.001;
 	vec3 grany = vec3(random(target.xy), random(target.zx), random(target.yz))*2.-1.;
 	vec3 follow = vec3(sin(uv.x*TAU),cos(uv.x*TAU),0)*2.;
+	follow.xz *= rotation(time);
+	follow.yz *= rotation(time);
 	float far = smoothstep(0.0, 0.1, length(follow-pos));
 	float close = 1.-far;
 	velocity *= friction;
-	velocity += curl * 0.4 * speed * close;
-	velocity += grany * 0.1 * speed * close;
-	velocity += normalize(follow-pos) * far * 0.2 * speed;
+	velocity += curl * 0.4 * speed;
+	velocity += grany * 0.1 * speed;
+	// velocity += normalize(follow-pos) * far * 0.1 * speed;
 	gl_FragColor = vec4(velocity, 1);
 	// gl_FragColor = texture2D(datamap, uv);
 }

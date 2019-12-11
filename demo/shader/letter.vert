@@ -11,6 +11,7 @@ uniform vec3 camera;
 const float PI = 3.1415;
 
 varying vec2 vUv;
+varying vec4 vColor;
 
 mat2 rotation (float a) { float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
 float random (in vec2 st) { return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123); }
@@ -39,14 +40,18 @@ void main () {
 	// pos.y += (pow(wave, .5)*2.-1.)/2.;
 	// pos = curve(uv.z*1.);
 	float fade = 1.0;
-	fade *= smoothstep(0.0, 0.1, data.w);
+	fade *= smoothstep(0.0, 0.2, data.w);
 
+	float ciao = 0.8;
+	fade += smoothstep(ciao,1.0,data.w)*2.;
+
+	vColor = vec4(smoothstep(1.0,ciao,data.w));
 
 	float distCam = length(camera-pos);
 	vec3 forward = normalize(camera-pos);
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.05 * fade;
+	float radius = 0.04 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
 	pos += (pivot.x * right + pivot.y * up) * radius;

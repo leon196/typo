@@ -48,9 +48,9 @@ void main() {
 	float dither = random(uv);
 	vec4 background = vec4(0);
 	background.rgb = mix(vec3(1.,0.1,0.2), vec3(0.9,0.8, 1.0), uv.y+20.*dither/resolution.y);
-	float blend = smoothstep(0.,1.,length(p));
-	gl_FragColor = background + texture2D(frame, uv);
+	float blend = smoothstep(0.5,1.,length(p));
+	gl_FragColor = texture2D(frame, uv);
 	// gl_FragColor = abs(mix(texture2D(buffermap, uv), texture2D(datamap, uv), step(0.5,uv.y)));
-	// gl_FragColor = mix(gl_FragColor, blur, blend);
+	gl_FragColor = mix(gl_FragColor, blur, blend);
 	// gl_FragColor = blur;
 }
