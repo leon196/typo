@@ -18,7 +18,7 @@ loadFiles('data/',['eye.ply'], "arraybuffer", function(plys) {
 	})
 
 // shaders file to load
-loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag', 'letter.vert', 'letter.frag', 'data.frag'], "text", function(shaders) {
+loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.vert','color.frag','circle.frag', 'letter.vert', 'letter.frag', 'position.frag', 'velocity.frag'], "text", function(shaders) {
 	var uniforms = {};
 
 	var materials = {};
@@ -27,7 +27,8 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		'quad': 			['quad.vert', 			'circle.frag'],
 		'letter': 		['letter.vert', 		'letter.frag'],
 		'blur': 			['screen.vert', 		'blur.frag'],
-		'data': 			['screen.vert', 		'data.frag'],
+		'position': 	['screen.vert', 		'position.frag'],
+		'velocity': 	['screen.vert', 		'velocity.frag'],
 		'screen': 		['screen.vert', 		'screen.frag'] };
 
 	loadMaterials();
@@ -45,7 +46,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	var column = 6;
 	var row = 6;
-	var text = "SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT";
+	var text = "SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT SALUT";
 	for (var i = 0; i < text.length; i++) {
 		var index = alphabet.indexOf(text[i]);
 		var x = (index%column)/column;
@@ -73,6 +74,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 	var frameToResize = [frame,frameScreen,frameBlurA,frameBlurB];
 
 	var frameDataBuffer = [];
+	var frameVelocity = [];
 	var currentFrameData = 0;
 	var array = [];
 	for (var i = 0; i < text.length; ++i) array.push(positions[i*3], positions[i*3+1], positions[i*3+2], 1)
@@ -83,6 +85,7 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		format: gl.RGBA,
 	}];
 	for (var i = 0; i < 2; ++i) frameDataBuffer.push(twgl.createFramebufferInfo(gl, frameAttachments, text.length,1));
+	for (var i = 0; i < 2; ++i) frameVelocity.push(twgl.createFramebufferInfo(gl, frameAttachments, text.length,1));
 
 	// for (var i = 0; i < 2; ++i) twgl.resizeFramebufferInfo(gl, frameDataBuffer[i], frameAttachments, text.length, 1);
 
@@ -98,8 +101,8 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 
 	var fontsize = 200; // Font size in pixels
 	var buffer = 600;    // Whitespace buffer around a glyph in pixels
-	var radius = 4;    // How many pixels around the glyph shape to use for encoding distance
-	var cutoff = 0.0  // How much of the radius (relative) is used for the inside part the glyph
+	var radius = 8;    // How many pixels around the glyph shape to use for encoding distance
+	var cutoff = 0.5  // How much of the radius (relative) is used for the inside part the glyph
 
 	var fontFamily = 'Nunito'; // css font-family
 	var fontWeight = 'normal';     // css font-weight
@@ -135,14 +138,19 @@ loadFiles('shader/',['screen.vert','blur.frag','screen.frag','point.vert','quad.
 		uniforms.viewProjection = m4.multiply(projection, m4.inverse(camera));
 		uniforms.camera = m4.getTranslation(camera);
 
-		uniforms.buffermap = frameDataBuffer[currentFrameData].attachments[0];
+		uniforms.positionmap = frameDataBuffer[currentFrameData].attachments[0];
+		uniforms.velocitymap = frameVelocity[currentFrameData].attachments[0];
 		currentFrameData = (currentFrameData+1)%2;
+		gl.bindFramebuffer(gl.FRAMEBUFFER, frameVelocity[currentFrameData].framebuffer);
+		gl.clearColor(0,0,0,0);
+		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+		gl.viewport(0, 0, text.length, 1);
+		draw(materials['velocity'], geometryQuad, gl.TRIANGLES);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frameDataBuffer[currentFrameData].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, text.length, 1);
-		draw(materials['data'], geometryQuad, gl.TRIANGLES);
-		// drawFrame(materials['data'], frameDataBuffer[currentFrameData].framebuffer);
+		draw(materials['position'], geometryQuad, gl.TRIANGLES);
 
 		// render scene
 		gl.bindFramebuffer(gl.FRAMEBUFFER, frame.framebuffer);

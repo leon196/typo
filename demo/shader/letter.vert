@@ -46,7 +46,7 @@ void main () {
 	vec3 forward = normalize(camera-pos);
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.1 * fade;
+	float radius = 0.05 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
 	pos += (pivot.x * right + pivot.y * up) * radius;

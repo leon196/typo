@@ -2,7 +2,7 @@ precision mediump float;
 
 uniform float time;
 uniform vec2 resolution;
-uniform sampler2D buffermap, datamap;
+uniform sampler2D positionmap, datamap, velocitymap;
 
 varying vec2 texcoord;
 
@@ -43,24 +43,13 @@ float fbm (vec3 p, float falloff) {
 
 void main() {
 	vec2 uv = texcoord;
-	vec4 data = texture2D(buffermap, uv);
+	vec4 data = texture2D(positionmap, uv);
 	vec3 target = texture2D(datamap, uv).xyz;
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
-	vec3 seed = pos;
-	// seed.xz *= rotation(time*.1);
-	// seed.yz *= rotation(time*.1);
-	vec3 curl = (vec3(
-		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
-		)*2.-1.);
-	curl.y *= 0.1;
-	// pos += normalize(-pos) * smoothstep(0.1, 0.3, length(pos)) * 0.1;
-	pos += curl * 0.01;
-	vec3 grany = vec3(random(target.xy), random(target.zx), random(target.yz))*2.-1.;
-	pos += grany * 0.002;
+	pos += texture2D(velocitymap, uv).xyz;
 	elapsed += .001;
-	pos = mix(pos, target, step(1.0, elapsed));
+	pos = mix(pos, vec3(0), step(1.0, elapsed));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);
-	// gl_FragColor = texture2D(datamap, uv);
 }
