@@ -1,3 +1,4 @@
+
 function generateParticles (attributes, subdivisions) {
 	subdivisions = subdivisions || [1,1];
 	var count = attributes.position.length / 3;
