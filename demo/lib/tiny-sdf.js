@@ -5,14 +5,13 @@
 
 var INF = 1e20;
 
-function TinySDF(fontSize, buffer, radius, cutoff, fontFamily, fontWeight) {
+function TinySDF(fontSize, dimension, radius, cutoff, fontFamily, fontWeight) {
     this.fontSize = fontSize || 24;
-    this.buffer = buffer === undefined ? 3 : buffer;
     this.cutoff = cutoff || 0.25;
     this.fontFamily = fontFamily || 'sans-serif';
     this.fontWeight = fontWeight || 'normal';
     this.radius = radius || 8;
-    var size = this.size = this.fontSize + this.buffer * 2;
+    var size = this.size = dimension;
 
     this.canvas = document.createElement('canvas');
     this.canvas.width = this.canvas.height = size;

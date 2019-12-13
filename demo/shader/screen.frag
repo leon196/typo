@@ -53,4 +53,5 @@ void main() {
 	// gl_FragColor = abs(mix(texture2D(buffermap, uv), texture2D(datamap, uv), step(0.5,uv.y)));
 	gl_FragColor = mix(gl_FragColor, blur, blend);
 	// gl_FragColor = blur;
+	// gl_FragColor = texture2D(fontmap, uv);
 }

@@ -48,12 +48,12 @@ void main() {
 	vec3 target = texture2D(datamap, uv).xyz;
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
-	vec3 seed = pos*8.;
+	vec3 seed = pos*16.;
 	float count = 1.+floor(8.*elapsed);
 	float variation = floor(random(uv+vec2(.987))*count)/count;
-	seed.xz *= rotation(sin(variation*TAU));
-	seed.yx *= rotation(sin(variation*TAU));
-	seed.yz *= rotation(sin(variation*TAU));
+	seed.xz *= rotation(sin(variation*TAU)*PI);
+	seed.yx *= rotation(sin(variation*TAU)*PI);
+	seed.yz *= rotation(sin(variation*TAU)*PI);
 	vec3 curl = (vec3(
 		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
 		)*2.-1.);
@@ -69,17 +69,20 @@ void main() {
 	float high = smoothstep(-1.0,1.0,pos.y);
 	float far = smoothstep(0.0, 0.1, length(follow-pos));
 	float close = 1.-far;
-	float grow = smoothstep(1.0,0.5,elapsed);
+	float grow = smoothstep(0.5,1.0,elapsed);
 	float stop = smoothstep(1.0,0.6,elapsed);
-	float shouldAvoid = smoothstep(1.0,0.4,length(pos-avoid));
-	velocity += curl * 8. * high;
-	velocity.xz += normalize(pos.xz+.001) * high;
-	velocity += vec3(0,1,0) * 2.;
-	// velocity += normalize(pos-avoid) * shouldAvoid * speed;
+	vec3 avoidDir = normalize(pos-avoid);
+	float avoidDist = length(pos-avoid);
+	float shouldAvoid = smoothstep(1.0,0.4,avoidDist);
+	velocity += curl * 8. * high * (1.-grow);
+	velocity.xz += normalize(pos.xz+.001) * high * (1.-grow);
+	// velocity += -avoidDir * (avoidDist) * 9. * high;
+	velocity += vec3(0,1,0) * 2. * (1.-grow);
+	// velocity += avoidDir * shouldAvoid * 4.;
 	// velocity *= grow;
-	// velocity += grany * grow * 0.01;
-	velocity = speed*velocity + friction*texture2D(velocitymap, uv).xyz;
-	velocity *= stop;
+	velocity += grany * (grow);
+	velocity = speed*velocity*stop + friction*texture2D(velocitymap, uv).xyz;
+	// velocity *= stop;
 	// velocity += normalize(follow-pos) * far * 0.1 * speed;
 	gl_FragColor = vec4(velocity, 1);
 	// gl_FragColor = texture2D(datamap, uv);

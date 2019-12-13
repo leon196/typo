@@ -2,7 +2,7 @@ precision mediump float;
 
 attribute vec3 position, anchor, quantity, uv;
 
-uniform sampler2D buffermap, datamap;
+uniform sampler2D buffermap, datamap, velocitymap;
 uniform mat4 viewProjection;
 uniform float time;
 uniform vec2 resolution;
@@ -30,6 +30,7 @@ void main () {
 
 	pos = vec3(0);
 	vec4 data = texture2D(buffermap, vec2(uv.z,0));
+	vec3 velocity = texture2D(velocitymap, vec2(uv.z,0)).xyz;
 	pos = data.xyz;
 	float range = 1.;
 	// pos.x += (uv.z*2.-1.)*range;
@@ -41,23 +42,24 @@ void main () {
 	// pos = curve(uv.z*1.);
 	float fade = 1.0;
 	float hello = 0.2;
-	float ciao = 0.5;
+	float ciao = 0.9;
+	float goodbye = smoothstep(1.0,ciao,data.w);
 	fade *= smoothstep(0.0, hello, data.w);
 
-	fade += smoothstep(ciao,1.0,data.w)*2.;
+	fade += smoothstep(ciao,1.0,data.w)*4.;
 
-	vColor = vec4(smoothstep(0.0,hello,data.w)*smoothstep(1.0,ciao,data.w));
+	vColor = vec4(smoothstep(0.0,hello,data.w)*goodbye);
 
 	float distCam = length(camera-pos);
-	vec3 forward = normalize(camera-pos);
+	vec3 forward = normalize(mix(camera-pos, velocity, goodbye));
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.02 * fade;
+	float radius = 0.01 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
-	// pos += (pivot.x * right + pivot.y * up) * radius;
+	pos += (pivot.x * right + pivot.y * up) * radius;
 	gl_Position = viewProjection * vec4(pos, 1);
-	pivot.x *= resolution.y/resolution.x;
-	pivot.y *= -1.;
-	gl_Position.xy += pivot.xy * radius;
+	// pivot.x *= resolution.y/resolution.x;
+	// pivot.y *= -1.;
+	// gl_Position.xy += pivot.xy * radius;
 }
