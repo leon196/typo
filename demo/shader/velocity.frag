@@ -48,12 +48,13 @@ void main() {
 	vec3 target = texture2D(datamap, uv).xyz;
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
-	vec3 seed = pos*16.;
-	float count = 1.+floor(8.*elapsed);
+	vec3 seed = pos*8.;
+	float count = 1.+floor(12.*elapsed);
 	float variation = floor(random(uv+vec2(.987))*count)/count;
-	seed.xz *= rotation(sin(variation*TAU)*PI);
-	seed.yx *= rotation(sin(variation*TAU)*PI);
-	seed.yz *= rotation(sin(variation*TAU)*PI);
+	float t = time*.01;
+	seed.xz *= rotation(sin(variation*TAU+t)*TAU);
+	seed.yx *= rotation(sin(variation*TAU+t)*TAU);
+	seed.yz *= rotation(sin(variation*TAU+t)*TAU);
 	vec3 curl = (vec3(
 		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
 		)*2.-1.);
@@ -75,7 +76,7 @@ void main() {
 	float avoidDist = length(pos-avoid);
 	float shouldAvoid = smoothstep(1.0,0.4,avoidDist);
 	velocity += curl * 8. * high * (1.-grow);
-	velocity.xz += normalize(pos.xz+.001) * high * (1.-grow);
+	velocity.xz += normalize(pos.xz+.001) * high * (1.-grow) * 4.;
 	// velocity += -avoidDir * (avoidDist) * 9. * high;
 	velocity += vec3(0,1,0) * 2. * (1.-grow);
 	// velocity += avoidDir * shouldAvoid * 4.;

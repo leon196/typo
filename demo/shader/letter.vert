@@ -51,7 +51,7 @@ void main () {
 	vColor = vec4(smoothstep(0.0,hello,data.w)*goodbye);
 
 	float distCam = length(camera-pos);
-	vec3 forward = normalize(mix(camera-pos, velocity, goodbye));
+	vec3 forward = normalize(camera-pos);//mix(camera-pos, velocity, goodbye));
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
 	float radius = 0.01 * fade;
