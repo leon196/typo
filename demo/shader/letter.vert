@@ -40,20 +40,24 @@ void main () {
 	// pos.y += (pow(wave, .5)*2.-1.)/2.;
 	// pos = curve(uv.z*1.);
 	float fade = 1.0;
-	fade *= smoothstep(0.0, 0.2, data.w);
+	float hello = 0.2;
+	float ciao = 0.5;
+	fade *= smoothstep(0.0, hello, data.w);
 
-	float ciao = 0.8;
-	fade += smoothstep(ciao,1.0,data.w)*2.;
+	fade += smoothstep(ciao,1.0,data.w)*4.;
 
-	vColor = vec4(smoothstep(1.0,ciao,data.w));
+	vColor = vec4(smoothstep(0.0,hello,data.w)*smoothstep(1.0,ciao,data.w));
 
 	float distCam = length(camera-pos);
 	vec3 forward = normalize(camera-pos);
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.04 * fade;
+	float radius = 0.1 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
-	pos += (pivot.x * right + pivot.y * up) * radius;
+	// pos += (pivot.x * right + pivot.y * up) * radius;
 	gl_Position = viewProjection * vec4(pos, 1);
+	pivot.x *= resolution.y/resolution.x;
+	pivot.y *= -1.;
+	gl_Position.xy += pivot.xy * radius;
 }
