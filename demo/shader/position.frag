@@ -49,11 +49,11 @@ void main() {
 	float elapsed = data.w;
 	float variation = random(uv+vec2(.8946));
 	vec3 follow = vec3(0,-2,0);//vec3(sin(uv.x*TAU),cos(uv.x*TAU),0)*2.;
-	follow.x += sin(time)*.1;
+	// follow.x += sin(time)*.1;
 	// follow.xz *= rotation(time*.2);
 	// follow.yz *= rotation(time*.2);
 	pos += texture2D(velocitymap, uv).xyz;
-	elapsed += .001 + .005 * variation;
+	elapsed += .002 + .005 * variation;
 	pos = mix(pos, follow, step(1.0, elapsed));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);
