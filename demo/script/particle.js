@@ -41,12 +41,12 @@ function Particle (text) {
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, this.size, 1);
-		draw(asset.material['velocity'], asset.geometry['quad'], gl.TRIANGLES);
+		draw(asset.material['velocity'], asset.geometry['screen'], gl.TRIANGLES);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.position[this.current].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, this.size, 1);
-		draw(asset.material['position'], asset.geometry['quad'], gl.TRIANGLES);
+		draw(asset.material['position'], asset.geometry['screen'], gl.TRIANGLES);
 	}
 }

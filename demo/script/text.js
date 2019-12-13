@@ -1,9 +1,9 @@
 
 var fontFamily = 'Nunito';
 var fontWeight = 'normal';
-var fontsize = 1024/10;
-var radius = 2;
-var cutoff = 0.5;
+var fontsize = 1024/6;
+var radius = 4;
+var cutoff = 0.0;
 var tinySDFGenerator = new TinySDF(fontsize, 1024, radius, cutoff, fontFamily, fontWeight);
 
 var alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,";

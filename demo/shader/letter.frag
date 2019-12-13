@@ -7,5 +7,5 @@ varying vec2 vUv;
 varying vec4 vColor;
 
 void main() {
-	gl_FragColor = vColor*texture2D(fontmap, vUv);
+	gl_FragColor = vColor * texture2D(fontmap, vUv).r;
 }

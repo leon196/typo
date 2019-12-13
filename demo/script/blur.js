@@ -1,6 +1,4 @@
 
-var gl = document.getElementById('canvas').getContext('webgl');
-
 var Blur = function () {
 	this.frameA = twgl.createFramebufferInfo(gl);
 	this.frameB = twgl.createFramebufferInfo(gl);

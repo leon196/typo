@@ -32,6 +32,7 @@ void main () {
 	vec4 data = texture2D(buffermap, vec2(uv.z,0));
 	vec3 velocity = texture2D(velocitymap, vec2(uv.z,0)).xyz;
 	pos = data.xyz;
+	float elapsed = data.w;
 	float range = 1.;
 	// pos.x += (uv.z*2.-1.)*range;
 	float x = pos.x / 2. / range;
@@ -43,12 +44,15 @@ void main () {
 	float fade = 1.0;
 	float hello = 0.2;
 	float ciao = 0.9;
-	float goodbye = smoothstep(1.0,ciao,data.w);
-	fade *= smoothstep(0.0, hello, data.w);
+	float goodbye = smoothstep(1.0,ciao,elapsed);
+	float leaf = smoothstep(0.5,1.0,elapsed);
+	fade += smoothstep(hello, 0.0, elapsed) * 4.;
 
-	fade += smoothstep(ciao,1.0,data.w)*4.;
+	fade += smoothstep(ciao,1.0,elapsed)*8.;
 
-	vColor = vec4(smoothstep(0.0,hello,data.w)*goodbye);
+	vColor = vec4(1);
+	vColor.rgb = mix(vec3(0.560, 0.360, 0.098), vec3(0.556, 0.705, 0.192), leaf);
+	vColor *= smoothstep(0.0,hello,elapsed)*goodbye;
 
 	float distCam = length(camera-pos);
 	vec3 forward = normalize(camera-pos);//mix(camera-pos, velocity, goodbye));

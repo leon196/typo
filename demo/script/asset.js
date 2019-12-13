@@ -1,6 +1,4 @@
 
-var gl = document.getElementById('canvas').getContext('webgl');
-
 var asset = {};
 var uniforms = {};
 
@@ -11,8 +9,8 @@ asset.loaded = false;
 
 asset.shaderList = [
 	'screen.vert',
-	'blur.frag',
 	'screen.frag',
+	'blur.frag',
 	'point.vert',
 	'quad.vert',
 	'color.frag',
@@ -21,14 +19,12 @@ asset.shaderList = [
 	'letter.frag',
 	'position.frag',
 	'velocity.frag',
-	'tree.vert',
 ];
 
 asset.materialMap = {
 	'point': 			['point.vert', 			'color.frag'],
 	'quad': 			['quad.vert', 			'circle.frag'],
 	'letter': 		['letter.vert', 		'letter.frag'],
-	'tree': 			['tree.vert', 			'letter.frag'],
 	'blur': 			['screen.vert', 		'blur.frag'],
 	'position': 	['screen.vert', 		'position.frag'],
 	'velocity': 	['screen.vert', 		'velocity.frag'],
@@ -39,7 +35,7 @@ asset.meshesList = [
 ];
 
 asset.geometry = {
-	'quad': twgl.createBufferInfoFromArrays(gl, { position:[-1,-1,0,1,-1,0,-1,1,0,-1,1,0,1,-1,0,1,1,0] }),
+	'screen': twgl.createBufferInfoFromArrays(gl, { position:[-1,-1,0,1,-1,0,-1,1,0,-1,1,0,1,-1,0,1,1,0] }),
 };
 
 // var attributes = { position: ply['eye.ply'].vertices, color: ply['eye.ply'].colors, normal: ply['eye.ply'].normals };
@@ -74,7 +70,8 @@ asset.check = function () {
 
 asset.loadMaterials = function () {
 	Object.keys(asset.materialMap).forEach(function(key) {
-		asset.material[key] = twgl.createProgramInfo(gl, [ asset.shaders[ asset.materialMap[key][0] ], asset.shaders[ asset.materialMap[key][1] ] ]);
+		var program = twgl.createProgramInfo(gl, [ asset.shaders[ asset.materialMap[key][0] ], asset.shaders[ asset.materialMap[key][1] ] ]);
+		asset.material[key] = program;
 	});
 }
 
@@ -85,7 +82,7 @@ socket.on('change', function(data) {
 		const url = data.path.substr("demo/shader/".length);
 		loadFiles("shader/",[url], "text", function(shade) {
 			asset.shaders[url] = shade[url];
-			loadMaterials();
+			asset.loadMaterials();
 		});
 	}
 });

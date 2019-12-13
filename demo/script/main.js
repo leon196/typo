@@ -34,7 +34,7 @@ window.onload = function() {
 			cameraAngle[1] += mouse.delta.y * deltaTime / 4.;
 		}
 
-		m4.rotateY(m4.identity(), cameraAngle[0], camera);
+		m4.rotateY(m4.translation([0,1,0]), cameraAngle[0], camera);
 		m4.rotateX(camera, cameraAngle[1], camera);
 		m4.translate(camera, [0,0,cameraDistance], camera);
 		uniforms.viewProjection = m4.multiply(projection, m4.inverse(camera));
