@@ -53,7 +53,7 @@ void main() {
 	// follow.xz *= rotation(time*.2);
 	// follow.yz *= rotation(time*.2);
 	pos += texture2D(velocitymap, uv).xyz;
-	elapsed += .002 + .005 * variation;
+	elapsed += .001 + .001 * variation;
 	pos = mix(pos, follow, step(1.0, elapsed));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);

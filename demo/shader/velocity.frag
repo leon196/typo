@@ -49,7 +49,7 @@ void main() {
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
 	vec3 seed = pos*4.;
-	float count = 4.;
+	float count = 8.;
 	float variation = floor(random(uv+vec2(.123))*count)/count;
 	seed.xz *= rotation(sin(variation));
 	seed.yz *= rotation(sin(variation));
@@ -58,8 +58,8 @@ void main() {
 		)*2.-1.);
 	// curl.y *= 0.1;
 	// float variation = random(uv+vec2(.123));
-	float friction = 0.9;// + 0.045 * variation;
-	float speed = 0.01;
+	float friction = 0.99;// + 0.045 * variation;
+	float speed = 0.001;
 	vec3 grany = vec3(random(target.xy), random(target.zx), random(target.yz))*2.-1.;
 	vec3 avoid = vec3(0,1,0);
 	vec3 follow = vec3(sin(uv.x*TAU),cos(uv.x*TAU),0)*2.;
