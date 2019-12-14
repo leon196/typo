@@ -19,6 +19,10 @@ asset.shaderList = [
 	'letter.frag',
 	'position.frag',
 	'velocity.frag',
+	'liquidV.frag',
+	'liquidP.frag',
+	'liquidS.vert',
+	'liquidS.frag',
 ];
 
 asset.materialMap = {
@@ -28,6 +32,9 @@ asset.materialMap = {
 	'blur': 			['screen.vert', 		'blur.frag'],
 	'position': 	['screen.vert', 		'position.frag'],
 	'velocity': 	['screen.vert', 		'velocity.frag'],
+	'liquidV': 		['screen.vert', 		'liquidV.frag'],
+	'liquidP': 		['screen.vert', 		'liquidP.frag'],
+	'liquidS': 		['liquidS.vert', 		'liquidS.frag'],
 	'screen': 		['screen.vert', 		'screen.frag'] };
 
 asset.meshesList = [

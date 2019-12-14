@@ -1,6 +1,6 @@
 precision mediump float;
 
-uniform float time;
+uniform float time, count;
 uniform sampler2D positionmap, datamap, velocitymap;
 
 varying vec2 texcoord;
@@ -55,8 +55,9 @@ void main() {
 	pos += texture2D(velocitymap, uv).xyz;
 	// pos = normalize(pos-avoid) * max(1.0,length(pos-avoid));
 	elapsed += .002;// + .0003 * variation;
-	// elapsed = fract(time*.1+variation);
-	pos = mix(pos, follow, step(1.0, elapsed+.002));
+	elapsed = fract(time*.2+variation*.5);
+	pos = min(abs(pos), vec3(0.4)) * sign(pos);
+	pos = mix(pos, target*.01+vec3(sin(time)*.1,0,0), step(1.0, elapsed+.01));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);
 }

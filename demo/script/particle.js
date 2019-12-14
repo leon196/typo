@@ -6,6 +6,13 @@ function Particle (text) {
 	this.velocity = [];
 	this.current = 0;
 	this.size = text.length;
+	this.uniforms = {
+		time: 0,
+		positionmap: 0,
+		velocitymap: 0,
+		datamap: 0,
+		count: this.size,
+	};
 
 	var array = [];
 	for (var i = 0; i < text.length; ++i) array.push(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1, Math.random());
@@ -21,7 +28,7 @@ function Particle (text) {
 	for (var i = 0; i < 2; ++i) this.position.push(twgl.createFramebufferInfo(gl, this.attachments, this.size, 1));
 	for (var i = 0; i < 2; ++i) this.velocity.push(twgl.createFramebufferInfo(gl, this.attachments, this.size, 1));
 
-	uniforms.datamap = twgl.createTexture(gl, {
+	this.uniforms.datamap = twgl.createTexture(gl, {
 		mag: gl.NEAREST,
 		min: gl.NEAREST,
 		type: gl.FLOAT,
@@ -31,22 +38,28 @@ function Particle (text) {
 		src: new Float32Array(array)
 	})
 
-	this.update = function () {
-		
-		uniforms.positionmap = this.position[this.current].attachments[0];
-		uniforms.velocitymap = this.velocity[this.current].attachments[0];
+	this.update = function (deltaTime, shaderVelocity, shaderPosition) {
+		this.uniforms.time += deltaTime;
+		this.uniforms.positionmap = this.position[this.current].attachments[0];
+		this.uniforms.velocitymap = this.velocity[this.current].attachments[0];
 		this.current = (this.current+1)%2;
 		
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.velocity[this.current].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, this.size, 1);
-		draw(asset.material['velocity'], asset.geometry['screen'], gl.TRIANGLES);
+		gl.useProgram(shaderVelocity.program);
+		twgl.setBuffersAndAttributes(gl, shaderVelocity, asset.geometry['screen']);
+		twgl.setUniforms(shaderVelocity, this.uniforms);
+		twgl.drawBufferInfo(gl, asset.geometry['screen'], gl.TRIANGLES);
 
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.position[this.current].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 		gl.viewport(0, 0, this.size, 1);
-		draw(asset.material['position'], asset.geometry['screen'], gl.TRIANGLES);
+		gl.useProgram(shaderPosition.program);
+		twgl.setBuffersAndAttributes(gl, shaderPosition, asset.geometry['screen']);
+		twgl.setUniforms(shaderPosition, this.uniforms);
+		twgl.drawBufferInfo(gl, asset.geometry['screen'], gl.TRIANGLES);
 	}
 }

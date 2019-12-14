@@ -46,21 +46,22 @@ void main () {
 	float ciao = 0.9;
 	float goodbye = smoothstep(1.0,ciao,elapsed);
 	float leaf = smoothstep(0.5,1.0,elapsed);
-	fade += smoothstep(hello, 0.0, elapsed) * 4.;
-	fade += smoothstep(ciao,1.0,elapsed)*8.;
+	// fade += smoothstep(hello, 0.0, elapsed) * 4.;
+	// fade += smoothstep(ciao,1.0,elapsed)*8.;
 
 	vColor = vec4(1);
+	vColor.rgb = 1.-(normalize(velocity)*.5+.5);
 	// vColor.rgb = mix(vec3(0.560, 0.360, 0.098), vec3(0.556, 0.705, 0.192), leaf);
-	vColor *= smoothstep(0.0,hello,elapsed)*goodbye;
+	// vColor *= smoothstep(0.0,hello,elapsed)*goodbye;
 
 	float distCam = length(camera-pos);
-	vec3 forward = normalize(camera-pos);//mix(camera-pos, velocity, goodbye));
+	vec3 forward = normalize(velocity);//mix(camera-pos, velocity, goodbye));
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
 	float radius = 0.01 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
-	vUv = (anchor.xy*.5+.5)/6.+uv.xy;
-	pos += (pivot.x * right + pivot.y * up) * radius;
+	vUv = anchor.xy;
+	pos += (pivot.x * right + pivot.y * forward) * radius;
 	gl_Position = viewProjection * vec4(pos, 1);
 	// pivot.x *= resolution.y/resolution.x;
 	// pivot.y *= -1.;

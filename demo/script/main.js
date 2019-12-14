@@ -10,7 +10,7 @@ window.onload = function() {
 	var projection = m4.identity();
 
 	var frame = twgl.createFramebufferInfo(gl);
-	var particle;
+	var particleTree, particleLiquid;
 	var blur = new Blur();
 	var ready = false;
 
@@ -19,7 +19,8 @@ window.onload = function() {
 	uniforms.fontmap = createFontMap();
 
 	function init () {
-		particle = new Particle(treetext);
+		particleTree = new Particle(treetext);
+		particleLiquid = new Particle(liquidtext);
 		ready = true;
 	}
 
@@ -34,7 +35,7 @@ window.onload = function() {
 			cameraAngle[1] += mouse.delta.y * deltaTime / 4.;
 		}
 
-		m4.rotateY(m4.translation([0,1,0]), cameraAngle[0], camera);
+		m4.rotateY(m4.translation([0,0,0]), cameraAngle[0], camera);
 		m4.rotateX(camera, cameraAngle[1], camera);
 		m4.translate(camera, [0,0,cameraDistance], camera);
 		uniforms.viewProjection = m4.multiply(projection, m4.inverse(camera));
@@ -43,16 +44,30 @@ window.onload = function() {
 		if (asset.loaded) {
 			if (!ready) init();
 
-			particle.update();
+
+			particleTree.update(deltaTime, asset.material['velocity'], asset.material['position']);
+			particleLiquid.update(deltaTime, asset.material['liquidV'], asset.material['liquidP']);
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, frame.framebuffer);
 			gl.clearColor(0,0,0,1);
-			gl.clear(gl.COLOR_BUFFER_BIT);
+			gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 			gl.depthMask(false);
 	  	gl.enable(gl.BLEND);
 			gl.blendFunc(gl.ONE, gl.ONE);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-			draw(asset.material['letter'], particle.geometry);
+
+			uniforms.positionmap = particleTree.uniforms.positionmap;
+			uniforms.velocitymap = particleTree.uniforms.velocitymap;
+			uniforms.datamap = particleTree.uniforms.datamap;
+			// draw(asset.material['letter'], particleTree.geometry);
+
+			gl.depthMask(true);
+	  	gl.enable(gl.DEPTH_TEST);
+	  	gl.disable(gl.BLEND);
+			uniforms.positionmap = particleLiquid.uniforms.positionmap;
+			uniforms.velocitymap = particleLiquid.uniforms.velocitymap;
+			uniforms.datamap = particleLiquid.uniforms.datamap;
+			draw(asset.material['liquidS'], particleLiquid.geometry);
 
 			blur.update(frame);
 			uniforms.frame = frame.attachments[0];
