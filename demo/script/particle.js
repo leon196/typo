@@ -1,21 +1,28 @@
 
-function Particle (text) {
+function Particle (attributes) {
 
-	this.geometry = createParticlesWithText(text);
+	this.geometry = [];
+	this.size = 0;
+	for (var i = 0; i < attributes.length; ++i) {
+		this.geometry.push(twgl.createBufferInfoFromArrays(gl, attributes[i]));
+		this.size += attributes[i].position.length/3/4;
+	}
 	this.position = [];
 	this.velocity = [];
 	this.current = 0;
-	this.size = text.length;
+	this.dimension = Math.pow(2, Math.ceil(Math.log(Math.sqrt(this.size)) / Math.log(2)));
 	this.uniforms = {
 		time: 0,
 		positionmap: 0,
 		velocitymap: 0,
 		datamap: 0,
-		count: this.size,
+		size: this.size,
+		dimension: this.dimension,
 	};
 
+	console.log(this.dimension)
 	var array = [];
-	for (var i = 0; i < text.length; ++i) array.push(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1, Math.random());
+	for (var i = 0; i < this.dimension*this.dimension; ++i) array.push(Math.random()*2-1, Math.random()*2-1, Math.random()*2-1, Math.random());
 
 	this.attachments = [{
 		mag: gl.NEAREST,
@@ -25,16 +32,16 @@ function Particle (text) {
 		src: new Float32Array(array)
 	}];
 
-	for (var i = 0; i < 2; ++i) this.position.push(twgl.createFramebufferInfo(gl, this.attachments, this.size, 1));
-	for (var i = 0; i < 2; ++i) this.velocity.push(twgl.createFramebufferInfo(gl, this.attachments, this.size, 1));
+	for (var i = 0; i < 2; ++i) this.position.push(twgl.createFramebufferInfo(gl, this.attachments, this.dimension, this.dimension));
+	for (var i = 0; i < 2; ++i) this.velocity.push(twgl.createFramebufferInfo(gl, this.attachments, this.dimension, this.dimension));
 
 	this.uniforms.datamap = twgl.createTexture(gl, {
 		mag: gl.NEAREST,
 		min: gl.NEAREST,
 		type: gl.FLOAT,
 		format: gl.RGBA,
-		width: this.size,
-		height: 1,
+		width: this.dimension,
+		height: this.dimension,
 		src: new Float32Array(array)
 	})
 
@@ -47,7 +54,7 @@ function Particle (text) {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.velocity[this.current].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0, 0, this.size, 1);
+		gl.viewport(0, 0, this.dimension, this.dimension);
 		gl.useProgram(shaderVelocity.program);
 		twgl.setBuffersAndAttributes(gl, shaderVelocity, asset.geometry['screen']);
 		twgl.setUniforms(shaderVelocity, this.uniforms);
@@ -56,10 +63,16 @@ function Particle (text) {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, this.position[this.current].framebuffer);
 		gl.clearColor(0,0,0,0);
 		gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
-		gl.viewport(0, 0, this.size, 1);
+		gl.viewport(0, 0, this.dimension, this.dimension);
 		gl.useProgram(shaderPosition.program);
 		twgl.setBuffersAndAttributes(gl, shaderPosition, asset.geometry['screen']);
 		twgl.setUniforms(shaderPosition, this.uniforms);
 		twgl.drawBufferInfo(gl, asset.geometry['screen'], gl.TRIANGLES);
+	}
+
+	this.draw = function (material) {
+		for (var i = 0; i < this.geometry.length; ++i) {
+			draw(material, this.geometry[i]);
+		}
 	}
 }

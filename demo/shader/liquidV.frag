@@ -1,12 +1,15 @@
 precision mediump float;
 
-uniform float time, count;
+uniform float time, dimension;
 uniform sampler2D positionmap, datamap, velocitymap;
 
 varying vec2 texcoord;
 
 const float PI = 3.1415;
 const float TAU = 6.283;
+const float count = 16384.;
+// const float count = 1048576.;
+const float countmax = 100.;
 
 mat2 rotation (float a) { float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
 float random(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
@@ -48,38 +51,40 @@ void main() {
 	vec3 pos = data.xyz;
 	float elapsed = data.w;
 
-	vec3 seed = pos*12.;
-	// float count = 1.+floor(12.*elapsed);
-	float variation = 0.;//floor(random(uv+vec2(.987))*count)/count;
-	float t = 84.;//time*.01;
-	seed.xz *= rotation(sin(variation*TAU+t)*TAU);
-	seed.yx *= rotation(sin(variation*TAU+t)*TAU);
-	seed.yz *= rotation(sin(variation*TAU+t)*TAU);
-	vec3 curl = (vec3(
-		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
-		)*2.-1.);
+	// vec3 seed = pos*12.;
+	// // float count = 1.+floor(12.*elapsed);
+	// float variation = 0.;//floor(random(uv+vec2(.987))*count)/count;
+	// float t = 84.;//time*.01;
+	// seed.xz *= rotation(sin(variation*TAU+t)*TAU);
+	// seed.yx *= rotation(sin(variation*TAU+t)*TAU);
+	// seed.yz *= rotation(sin(variation*TAU+t)*TAU);
+	// vec3 curl = (vec3(
+	// 	noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
+	// 	)*2.-1.);
 
 	vec3 grany = vec3(random(target.xy), random(target.zx), random(target.yz))*2.-1.;
 	vec3 avoid = vec3(0,0,0);
 	vec3 follow = vec3(0,0,0);
-	float bounds = 0.4;
+	float bounds = 0.5;
 
 	vec3 collide = vec3(
 		smoothstep(bounds-.1, bounds+.1, abs(pos.x)),
 		smoothstep(bounds-.1, bounds+.1, abs(pos.y)),
 		smoothstep(bounds-.1, bounds+.1, abs(pos.z)));
+	// float collide = smoothstep(0.,0.1,length(pos)-bounds);
 
-	float radius = .3*elapsed;
+	float radius = .5*(elapsed);//*random(uv+vec2(9.5247));
 
-	const float count = 2970.;
-	for (float other = 0.; other < count; ++other) {
-		float index = other/count;
-		if (abs(index-uv.x) > 0.01) {
-			vec3 otherP = texture2D(positionmap, vec2(index,0)).xyz;
+	float dither = random(vec2(fract(time)));
+	for (float other = 0.; other < countmax; ++other) {
+		float index = mod(other + dither * count, count);
+		vec2 uvmap = vec2(mod(index,dimension)/dimension, floor(index/dimension)/dimension);
+		if (length(uvmap-uv) > 0.001) {
+			vec3 otherP = texture2D(positionmap, uvmap).xyz;
 			float distOther = length(otherP-pos);
 			vec3 dirOther = normalize(otherP-pos+.001);
 			avoid += -dirOther * smoothstep(radius,0.0, distOther)*(1.-collide);
-			follow += dirOther * smoothstep(0.1,0.5,distOther);
+			follow += dirOther * smoothstep(0.0,0.5,distOther);
 		}
 	}
 
@@ -87,12 +92,13 @@ void main() {
 	twist.xz *= rotation(0.01);
 	twist = normalize(twist-pos);
 
-	velocity += 10. * avoid / count;
-	velocity += 0.1 * follow / count;
+	// avoid.y *= 10.;
+	velocity += 20. * avoid / countmax;
+	velocity += .5 * follow / countmax;
 	// velocity += normalize(follow+.001);
-	// velocity += twist * .1;
-	velocity += curl * .1;
-	velocity += vec3(0,-1,0) * .5 * (1.-collide.y);
+	velocity += twist * 2.;
+	// velocity += curl * .1;
+	velocity += vec3(0,-1,0) * 2.;// * (1.-collide.y);
 	velocity += normalize(-pos) * collide * 2.;
 	// velocity += grany * .1;
 
@@ -103,8 +109,8 @@ void main() {
 	// collide += abs(abs(pos.z)-0.5);
 	// collide = 1.-smoothstep(0.0, 0.01, collide);
 
-	float friction = 0.999;
-	float speed = 0.001;
+	float friction = 0.5;//+.1*random(uv+vec2(5.57467));
+	float speed = 0.001;//+.001*random(uv);
 	velocity = speed*velocity + friction*texture2D(velocitymap, uv).xyz;
 	velocity *= step(elapsed+.01, 1.0);
 	// velocity += normalize(follow-pos) * far * 0.1 * speed;

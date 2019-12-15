@@ -6,7 +6,7 @@ window.onload = function() {
 	var camera = m4.identity();
 	var cameraDistance = 2;
 	var cameraAngle = [0,0];
-	var fieldOfView = 60;
+	var fieldOfView = 50;
 	var projection = m4.identity();
 
 	var frame = twgl.createFramebufferInfo(gl);
@@ -19,8 +19,8 @@ window.onload = function() {
 	uniforms.fontmap = createFontMap();
 
 	function init () {
-		particleTree = new Particle(treetext);
-		particleLiquid = new Particle(liquidtext);
+		particleTree = new Particle(createParticlesWithText(treetext));
+		particleLiquid = new Particle(createParticlesWithText(liquidtext));
 		ready = true;
 	}
 
@@ -35,7 +35,7 @@ window.onload = function() {
 			cameraAngle[1] += mouse.delta.y * deltaTime / 4.;
 		}
 
-		m4.rotateY(m4.translation([0,0,0]), cameraAngle[0], camera);
+		m4.rotateY(m4.translation([0,-.2,0]), cameraAngle[0], camera);
 		m4.rotateX(camera, cameraAngle[1], camera);
 		m4.translate(camera, [0,0,cameraDistance], camera);
 		uniforms.viewProjection = m4.multiply(projection, m4.inverse(camera));
@@ -56,10 +56,10 @@ window.onload = function() {
 			gl.blendFunc(gl.ONE, gl.ONE);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-			uniforms.positionmap = particleTree.uniforms.positionmap;
-			uniforms.velocitymap = particleTree.uniforms.velocitymap;
-			uniforms.datamap = particleTree.uniforms.datamap;
-			// draw(asset.material['letter'], particleTree.geometry);
+			// uniforms.positionmap = particleTree.uniforms.positionmap;
+			// uniforms.velocitymap = particleTree.uniforms.velocitymap;
+			// uniforms.datamap = particleTree.uniforms.datamap;
+			// particleTree.draw(asset.material['letter']);
 
 			gl.depthMask(true);
 	  	gl.enable(gl.DEPTH_TEST);
@@ -67,7 +67,9 @@ window.onload = function() {
 			uniforms.positionmap = particleLiquid.uniforms.positionmap;
 			uniforms.velocitymap = particleLiquid.uniforms.velocitymap;
 			uniforms.datamap = particleLiquid.uniforms.datamap;
-			draw(asset.material['liquidS'], particleLiquid.geometry);
+			uniforms.size = particleLiquid.size;
+			uniforms.dimension = particleLiquid.dimension;
+			particleLiquid.draw(asset.material['liquidS']);
 
 			blur.update(frame);
 			uniforms.frame = frame.attachments[0];
