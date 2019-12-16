@@ -10,7 +10,7 @@ const float TAU = 6.283;
 // const float count = 4096.;
 // const float count = 16384.;
 const float count = 1048576.;
-const float countmax = 10.;
+const float countmax = 100.;
 
 mat2 rotation (float a) { float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
 float random(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
@@ -74,7 +74,7 @@ void main() {
 		smoothstep(bounds-.1, bounds+.1, abs(pos.z)));
 	// float collide = smoothstep(0.,0.1,length(pos)-bounds);
 
-	float radius = .2*(elapsed);//*random(uv+vec2(9.5247));
+	float radius = .5*pow(elapsed, 0.5);//*random(uv+vec2(9.5247));
 
 	float dither = random(vec2(fract(time)));
 	for (float other = 0.; other < countmax; ++other) {
@@ -85,7 +85,7 @@ void main() {
 			float distOther = length(otherP-pos);
 			vec3 dirOther = normalize(otherP-pos+.001);
 			avoid += -dirOther * smoothstep(radius,radius-.01, distOther);
-			follow += dirOther * smoothstep(0.5,1.5,distOther);
+			follow += dirOther * smoothstep(0.5,1.,distOther);
 		}
 	}
 
@@ -94,12 +94,12 @@ void main() {
 	twist = normalize(twist-pos);
 
 	// avoid.y *= 10.;
-	velocity += 40. * avoid / countmax;
-	velocity += 1.5 * follow / countmax;
+	velocity += 2.*avoid;
+	velocity += .5*follow;
 	// velocity += normalize(follow+.001);
 	// velocity += twist;
 	// velocity += curl * .1;
-	velocity += vec3(0,-1,0);// * (1.-collide.y);
+	// velocity += vec3(0,-1,0) ;// * (1.-collide.y);
 	// velocity += normalize(-pos) * collide * 2.;
 	// velocity += grany * .1;
 
@@ -110,11 +110,12 @@ void main() {
 	// collide += abs(abs(pos.z)-0.5);
 
 	float friction = 0.9;//+.1*random(uv+vec2(5.57467));
-	float speed = 0.001;//+.001*random(uv);
+	float speed = 0.0001;//+.001*random(uv);
 	// collide = 1.-smoothstep(0.0, 0.01, collide);
-	float bounce = step(bounds, abs(pos.y)+abs(velocity.y)*speed);
+	// float bounce = step(bounds, abs(pos.y)+abs(velocity.y)*speed);
 	// velocity *= mix(1., -1.0, bounce);
 	// friction *= mix(1., .5, bounce);
+	// velocity *= (1.-collide);
 	velocity = speed*velocity + friction*texture2D(velocitymap, uv).xyz;
 	velocity *= step(elapsed+.01, 1.0);
 	// velocity += normalize(follow-pos) * far * 0.1 * speed;
