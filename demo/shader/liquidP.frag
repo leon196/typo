@@ -57,7 +57,7 @@ void main() {
 	elapsed += .001 + .01 * variation;
 	// elapsed = fract(time*.1+variation*3.145);
 	// float elapsed2 = fract(time*(.01+.1*random(uv+vec2(5.54)))+variation*8.145);
-	// pos = min(abs(pos), vec3(0.4)) * sign(pos);
+	pos = min(abs(pos), vec3(0.5)) * sign(pos);
 	pos = mix(pos, target*.001+vec3(sin(time)*.5,0,0), step(1.0, elapsed+.001));
 	elapsed = fract(elapsed);
 	gl_FragColor = vec4(pos, elapsed);

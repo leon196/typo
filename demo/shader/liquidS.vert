@@ -56,13 +56,13 @@ void main () {
 	float leaf = smoothstep(0.5,1.0,elapsed);
 	// fade += smoothstep(hello, 0.0, elapsed) * 4.;
 	// fade += smoothstep(ciao,1.0,elapsed)*8.;
-	fade += elapsed*20.;
+	// fade += elapsed*2.;
 	fade *= smoothstep(1.0,0.9,elapsed);
 	// fade *= .5+.5*pow(random(uvmap), 0.5);
 
 	vColor = vec4(1);
 	// vColor.rgb = mix(vec3(0.517, 0.901, 0.984), vec3(1), elapsed);
-	vColor.rgb = hsv2rgb(vec3(.05, 1.-elapsed, 1.1));
+	vColor.rgb = hsv2rgb(vec3(.56, 1.-elapsed, 1.1));
 	// vColor.rgb = 1.-(normalize(velocity)*.5+.5);
 	// vColor.rgb = mix(vec3(0.560, 0.360, 0.098), vec3(0.556, 0.705, 0.192), leaf);
 	// vColor *= smoothstep(0.0,hello,elapsed)*goodbye;
@@ -72,7 +72,7 @@ void main () {
 	// vec3 forward = normalize(velocity);//mix(camera-pos, velocity, goodbye));
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
-	float radius = 0.001 * fade;
+	float radius = 0.003 * fade;
 	// radius *= smoothstep(1.1,2.5,distCam)*smoothstep(6.,3.,distCam)*smoothstep(1.5,1.,length(pos));
 	vUv = anchor.xy;
 	// pos += (pivot.x * right + pivot.y * forward) * radius;
