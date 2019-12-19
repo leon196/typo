@@ -1,0 +1,42 @@
+{
+	"animations": "animation/scene.json",
+	"fonts": {
+	},
+	"textures": {
+	},
+	"geometries": {
+	},
+	"shaders": {
+		"quad": {
+			"vertexShader": "shader/quad.vert",
+			"fragmentShader": "shader/color.frag"
+		},
+		"text": {
+			"vertexShader": "shader/mesh/text.vert",
+			"fragmentShader": "shader/mesh/text.frag",
+			"side": 2,
+			"depthTest": false,
+			"transparent": true
+		},
+		"bright": {
+			"vertexShader": "shader/filter/bloom/bright.vert",
+			"fragmentShader": "shader/filter/bloom/bright.frag"
+		},
+		"gaussian_blur": {
+			"vertexShader": "shader/filter/bloom/gaussian_blur.vert",
+			"fragmentShader": "shader/filter/bloom/gaussian_blur.frag"
+		},
+		"bloom": {
+			"vertexShader": "shader/filter/bloom/bloom.vert",
+			"fragmentShader": "shader/filter/bloom/bloom.frag"
+		},
+		"edge": {
+			"vertexShader": "shader/filter/fullscreen.vert",
+			"fragmentShader": "shader/filter/edge.frag"
+		},
+		"render": {
+			"vertexShader": "shader/filter/fullscreen.vert",
+			"fragmentShader": "shader/filter/render.frag"
+		}
+	}
+}
