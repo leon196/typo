@@ -2,7 +2,8 @@ precision mediump float;
 
 attribute vec3 position, anchor, quantity, uv;
 
-uniform sampler2D buffermap, datamap;
+uniform sampler2D buffermap, datamap, velocitymap, plycolor, plyposition;
+uniform float plydimension, plycount;
 uniform mat4 viewProjection;
 uniform float time;
 uniform vec2 resolution;
@@ -30,6 +31,7 @@ void main () {
 
 	pos = vec3(0);
 	vec4 data = texture2D(buffermap, vec2(uv.z,0));
+	vec3 velocity = texture2D(velocitymap, vec2(uv.z,0)).xyz;
 	pos = data.xyz;
 	float range = 1.;
 	// pos.x += (uv.z*2.-1.)*range;
@@ -40,15 +42,19 @@ void main () {
 	// pos.y += (pow(wave, .5)*2.-1.)/2.;
 	// pos = curve(uv.z*1.);
 	float fade = 1.0;
-	fade *= smoothstep(0.0, 0.2, data.w);
+	fade *= smoothstep(0.0, 0.5, data.w);
 
 	float ciao = 0.8;
 	fade += smoothstep(ciao,1.0,data.w)*2.;
 
-	vColor = vec4(smoothstep(1.0,ciao,data.w));
+	float i = mod(quantity.x * plydimension * plydimension, plycount);
+	vec2 uvi = vec2(mod(i, plydimension)/plydimension, floor(i/plydimension)/plydimension);
+	vec4 color = texture2D(plycolor, uvi);
+	vColor = color*vec4(smoothstep(1.0,ciao,data.w));
 
 	float distCam = length(camera-pos);
 	vec3 forward = normalize(camera-pos);
+	// vec3 forward = normalize(velocity);
 	vec3 right = normalize(cross(vec3(0,1,0), forward));
 	vec3 up = cross(right, forward);
 	float radius = 0.04 * fade;

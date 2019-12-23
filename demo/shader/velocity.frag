@@ -47,26 +47,24 @@ void main() {
 	vec3 velocity = texture2D(velocitymap, uv).xyz;
 	vec3 target = texture2D(datamap, uv).xyz;
 	vec3 pos = data.xyz;
-	vec3 seed = pos/2.;
-	// seed.xz *= rotation(time*.1);
-	// seed.yz *= rotation(time*.1);
+	vec3 seed = pos;
+	seed.xz *= rotation(time*.1);
+	seed.yz *= rotation(time*.1);
 	vec3 curl = (vec3(
 		noise(seed), noise(seed+vec3(64.5,91.57,7.52)), noise(seed+vec3(1.25,8.54,45.54))
 		)*2.-1.);
 	// curl.y *= 0.1;
 	float variation = random(uv+vec2(.123));
-	float friction = 0.95 + 0.045 * variation;
+	float friction = 0.95;// + 0.045 * variation;
 	float speed = 0.001;
+	float elapsed = data.w;
+	float ending = smoothstep(0.5, 1.0, elapsed);
 	vec3 grany = vec3(random(target.xy), random(target.zx), random(target.yz))*2.-1.;
-	vec3 follow = vec3(sin(uv.x*TAU),cos(uv.x*TAU),0)*2.;
-	follow.xz *= rotation(time);
-	follow.yz *= rotation(time);
-	float far = smoothstep(0.0, 0.1, length(follow-pos));
-	float close = 1.-far;
 	velocity *= friction;
-	velocity += curl * 0.4 * speed;
-	velocity += grany * 0.1 * speed;
-	// velocity += normalize(follow-pos) * far * 0.1 * speed;
+	velocity += curl * 2.0 * speed * ending;
+	// velocity.y += speed * ending;
+	// velocity += grany * 0.1 * speed;
+	// velocity += normalize(-pos) * 0.1;
 	gl_FragColor = vec4(velocity, 1);
 	// gl_FragColor = texture2D(datamap, uv);
 }
