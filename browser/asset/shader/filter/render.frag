@@ -18,7 +18,7 @@ float fbm (vec3 p) {
 void main () {
 
 	vec2 uv = vUv;
-	vec4 color = texture2D(frametarget, uv);
+	vec4 color = texture2D(framebuffer, uv);
 	vec4 blu = texture2D(blur, uv);
 	vec4 edgy = texture2D(frameedge, uv);
   // color += smoothstep(0.0,0.3,blu);

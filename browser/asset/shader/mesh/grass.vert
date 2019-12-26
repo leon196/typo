@@ -19,11 +19,11 @@ void main () {
 	float size = 0.1;//+.1*pow(abs(seed.y), 4.0);
 	// vec3 pos = vec3(seed.x, 0., seed.z) * 10.;
 	float thin = anchor.y*.45+.65;
-	float jitter = 0.01;
+	float jitter = 0.02;
 	float curler = 0.1;
 	float t = time*speed;
 	float y = anchor.y-1.;
-	float height = 4.+seed.y*4.;
+	float height = 4.+seed.y*2.;
 	// vec3 pos = vec3(seed.x, 0., seed.z) * radius;
 	// vec3 pos = vec3(cos(angle), 0., sin(angle)) * radius;
 	// pos.z += time/range;
@@ -47,12 +47,13 @@ void main () {
 	vec3 up = normalize(cross(right, forward));
 	size *= smoothstep(.5,1.,length(pos-cameraPos));
 	size *= smoothstep(0.0,0.1,ratio)*smoothstep(1.0,0.9,ratio);
-	size *= smoothstep(0.1,0.9,noise((pos.xz+offset)*.2));
+	size *= smoothstep(1.2,0.6,calculatePath(pos.xz+offset));
+	// size *= smoothstep(0.1,0.9,noise((pos.xz+offset)*.8));
 	// height *= smoothstep(range+1., 0., radius);
-	pos += (anchor.x*right - y*normal*height) * size;
+	pos += (anchor.x*right*thin/2. - y*normal*height) * size;
 
 	vColor = vec4(1);
-	vColor.rgb = vec3(0.364, 0.698, 0.062)*1.5;
+	vColor.rgb = vec3(0.364, 0.698, 0.062);
 	vColor.rgb = mix(vColor.rgb, vec3(0.243, 0.368, 0.133), seed.y*.5+.5);
 	vColor.rgb *= .5+.5*(1.-(anchor.y*.5+.5));
 	vUV = anchor;

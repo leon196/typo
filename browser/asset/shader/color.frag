@@ -11,6 +11,6 @@ void main () {
 	vec4 color = vColor;
 	vec3 normal = normalize(vNormal);
 	vec3 view = normalize(vView);
-	color.rgb *= dot(normal, view) * .5 + .5;
+	// color.rgb *= dot(normal, view) * .5 + .5;
 	gl_FragColor = color;
 }

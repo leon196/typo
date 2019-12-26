@@ -60,6 +60,13 @@ vec3 hsv2rgb(vec3 c) {
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+float calculatePath (vec2 pos) {
+    float path = 1.0;
+    pos.x += sin(pos.y*.25) * 2.;
+    path = smoothstep(4.,0., abs(pos.x));
+    return path;
+}
+
 float calculateElevation (vec2 pos) {
 
     float scale = .1;
@@ -78,6 +85,7 @@ float calculateElevation (vec2 pos) {
     // elevation += noise(pos*scale);
     elevation = sin(elevation * PI * cycle);
     elevation = 1.-pow(abs(elevation), peak);
+    elevation *= .1+.9*(1.-calculatePath(pos));
     return elevation * strength;
 }
 
