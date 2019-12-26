@@ -21,6 +21,15 @@
 			"fragmentShader": "shader/color.frag",
 			"side": 2
 		},
+		"skybox": {
+			"vertexShader": "shader/mesh/skybox.vert",
+			"fragmentShader": "shader/mesh/skybox.frag",
+			"side": 1
+		},
+		"cloud": {
+			"vertexShader": "shader/mesh/cloud.vert",
+			"fragmentShader": "shader/color.frag"
+		},
 		"text": {
 			"vertexShader": "shader/mesh/text.vert",
 			"fragmentShader": "shader/mesh/text.frag",

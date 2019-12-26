@@ -56,6 +56,7 @@ void main () {
 	vColor.rgb = vec3(0.364, 0.698, 0.062);
 	vColor.rgb = mix(vColor.rgb, vec3(0.243, 0.368, 0.133), seed.y*.5+.5);
 	vColor.rgb *= .5+.5*(1.-(anchor.y*.5+.5));
+	vColor.a = 0.5;
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;

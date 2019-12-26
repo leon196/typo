@@ -44,6 +44,7 @@ void main () {
 	vColor.rgb = mix(vColor.rgb, vec3(0.243, 0.368, 0.133), smoothstep(0.4,0.9,dot(normal, vec3(0,1,0))));
 	vColor.rgb = mix(vColor.rgb, vec3(.6), smoothstep(.8,1.1,calculatePath(pos.xz+offset)));
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, seed.y*.25+.5);
+	vColor.a = 0.5;
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;

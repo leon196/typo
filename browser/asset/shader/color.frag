@@ -7,7 +7,7 @@ varying vec2 vUV;
 
 void main () {
 	// if (length(vUV) > 1.0) discard;
-	if (random(vUV+fract(time)) > 0.5) discard;
+	if (random(vUV+fract(time)) > vColor.a) discard;
 	vec4 color = vColor;
 	vec3 normal = normalize(vNormal);
 	vec3 view = normalize(vView);
