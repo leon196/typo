@@ -64,17 +64,18 @@ float calculateElevation (vec2 pos) {
 
     float scale = .1;
     float cycle = 1.0;
-    float strength = 2.0;
-    float peak = 2.;
+    float strength = 10.0;
+    float peak = 0.5;
 
     float elevation = 0.;
     float amplitude = 0.5;
-    float falloff = 4.8;
-    const int count = 3;
+    float falloff = 2.8;
+    const int count = 2;
     for (int i = count; i > 0; --i) {
         elevation += noise(pos * scale / amplitude) * amplitude;
         amplitude /= falloff;
     }
+    // elevation += noise(pos*scale);
     elevation = sin(elevation * PI * cycle);
     elevation = 1.-pow(abs(elevation), peak);
     return elevation * strength;

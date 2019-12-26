@@ -1,10 +1,13 @@
 
+uniform float time;
+
 varying vec4 vColor;
 varying vec3 vNormal, vView;
 varying vec2 vUV;
 
 void main () {
 	// if (length(vUV) > 1.0) discard;
+	if (random(vUV+fract(time)) > 0.5) discard;
 	vec4 color = vColor;
 	vec3 normal = normalize(vNormal);
 	vec3 view = normalize(vView);

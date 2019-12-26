@@ -21,6 +21,7 @@ void main () {
 	vec4 color = texture2D(frametarget, uv);
 	vec4 blu = texture2D(blur, uv);
 	vec4 edgy = texture2D(frameedge, uv);
-  
+  // color += smoothstep(0.0,0.3,blu);
+  // color -= edgy;
 	gl_FragColor = color;
 }
