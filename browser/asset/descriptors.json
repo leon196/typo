@@ -15,6 +15,10 @@
 			"vertexShader": "shader/mesh/land.vert",
 			"fragmentShader": "shader/color.frag"
 		},
+		"grass": {
+			"vertexShader": "shader/mesh/grass.vert",
+			"fragmentShader": "shader/color.frag"
+		},
 		"text": {
 			"vertexShader": "shader/mesh/text.vert",
 			"fragmentShader": "shader/mesh/text.frag",

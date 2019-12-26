@@ -43,8 +43,10 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
-	Geometry.create(Geometry.random(20000), [1,1])
+	Geometry.create(Geometry.random(10000), [1,1])
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.land)));
+	Geometry.create(Geometry.random(10000), [1,1])
+	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
 	// console.log(TinySDF)
