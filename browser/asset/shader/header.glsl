@@ -59,3 +59,32 @@ vec3 hsv2rgb(vec3 c) {
 	vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
+
+float calculateElevation (vec2 pos) {
+
+    float scale = .1;
+    float cycle = 1.0;
+    float strength = 2.0;
+    float peak = 2.;
+
+    float elevation = 0.;
+    float amplitude = 0.5;
+    float falloff = 4.8;
+    const int count = 3;
+    for (int i = count; i > 0; --i) {
+        elevation += noise(pos * scale / amplitude) * amplitude;
+        amplitude /= falloff;
+    }
+    elevation = sin(elevation * PI * cycle);
+    elevation = 1.-pow(abs(elevation), peak);
+    return elevation * strength;
+}
+
+vec3 calculateNormal (vec2 pos) {
+    vec2 e = vec2(0.1, 0);
+    vec3 north = vec3(pos.x, calculateElevation(pos+e.yx), pos.y+e.x);
+    vec3 south = vec3(pos.x, calculateElevation(pos-e.yx), pos.y-e.x);
+    vec3 east = vec3(pos.x+e.x, calculateElevation(pos+e.xy), pos.y);
+    vec3 west = vec3(pos.x-e.x, calculateElevation(pos-e.xy), pos.y);
+    return (cross((north-south), (east-west)));
+}
