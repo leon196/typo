@@ -19,8 +19,8 @@ void main () {
 
 	vec2 uv = vUv;
 	vec4 color = texture2D(frametarget, uv);
-	vec4 blu = texture2D(blur, uv) * (Bloom.y + ExtraBloom.y);
+	vec4 blu = texture2D(blur, uv);
 	vec4 edgy = texture2D(frameedge, uv);
-
+  
 	gl_FragColor = color;
 }

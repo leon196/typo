@@ -65,13 +65,13 @@ export default class Geometry {
 			var geometry = new THREE.BufferGeometry();
 			attributeNames.forEach(name => {
 				var array = new Float32Array(arrays[name]);
-				geometry.addAttribute(name, new THREE.BufferAttribute(array, attributes[name].itemSize));
+				geometry.setAttribute(name, new THREE.BufferAttribute(array, attributes[name].itemSize));
 			});
-			geometry.addAttribute( 'anchor', new THREE.BufferAttribute( new Float32Array(anchors), 2 ) );
+			geometry.setAttribute( 'anchor', new THREE.BufferAttribute( new Float32Array(anchors), 2 ) );
 			if (geometry.attributes.quantity == null) {
-				geometry.addAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
+				geometry.setAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
 			}
-			// geometry.addAttribute( 'indexMap', new THREE.BufferAttribute( new Float32Array(indexMap), 2 ) );
+			// geometry.setAttribute( 'indexMap', new THREE.BufferAttribute( new Float32Array(indexMap), 2 ) );
 			geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
 			geometries.push(geometry);
 		}
@@ -95,8 +95,8 @@ export default class Geometry {
 				}
 			}
 		}
-		geometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
-		geometry.addAttribute('next', new THREE.BufferAttribute(new Float32Array(nexts), 3));
+		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+		geometry.setAttribute('next', new THREE.BufferAttribute(new Float32Array(nexts), 3));
 		return Geometry.create(geometry.attributes, subdivisions);
 	}
 
@@ -133,14 +133,13 @@ export default class Geometry {
 
 		var geometry = new THREE.BufferGeometry();
 		attributeNames.forEach(name => {
-			geometry.addAttribute(name, new THREE.BufferAttribute(new Float32Array(arrays[name]), attributes[name].itemSize));
+			geometry.setAttribute(name, new THREE.BufferAttribute(new Float32Array(arrays[name]), attributes[name].itemSize));
 		});
-		geometry.addAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
+		geometry.setAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
 		if (geometryToClone.index != null) {
 			geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
 		}
 		geometries.push(geometry);
-		console.log(geometries)
 		return geometries;
 	}
 

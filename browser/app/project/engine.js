@@ -43,28 +43,24 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
-	Geometry.create(Geometry.random(1000), [6,6]).forEach(geometry =>
-		engine.scene.add(new THREE.Mesh(geometry, assets.shaders.quad)));
-	engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
+	Geometry.create(Geometry.random(10000), [1,1])
+	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.land)));
+	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
-	console.log(TinySDF)
+	// console.log(TinySDF)
 	// var tinySDFGenerator = new TinySDF(fontsize, 1024, radius, cutoff, fontFamily, fontWeight);
 
-
-	engine.frametarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-		format: THREE.RGBAFormat,
-		type: THREE.FloatType});
-	engine.framebloom = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-		format: THREE.RGBAFormat,
-		type: THREE.FloatType});
-	engine.frameedge = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, {
-		format: THREE.RGBAFormat,
-		type: THREE.FloatType});
+	var w = window.innerWidth;
+	var h = window.innerHeight;
+	var options = { format: THREE.RGBAFormat, type: THREE.FloatType };
+	engine.frametarget = new THREE.WebGLRenderTarget(w, h, options);
+	engine.framebloom = new THREE.WebGLRenderTarget(w, h, options);
+	engine.frameedge = new THREE.WebGLRenderTarget(w, h, options);
 	engine.bloom = new Bloom(engine.frameedge.texture);
 
 	engine.sceneedge = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.edge);
-	engine.sceneedge.frustumCulled = false;
 	engine.scenerender = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.render);
+	engine.sceneedge.frustumCulled = false;
 	engine.scenerender.frustumCulled = false;
 
 	uniforms.frametarget = {value: engine.frametarget.texture};
@@ -72,6 +68,26 @@ export function initEngine () {
 	uniforms.framebloom = {value: engine.framebloom.texture};
 	uniforms.blur = {value: engine.bloom.blurTarget.texture};
 	uniforms.bloom = {value: engine.bloom.bloomTarget.texture};
+
+	
+
+// TinySDF.prototype.grid = function (text, column, row) {
+//     this.ctx.clearRect(0, 0, this.size, this.size);
+//     var letter = 0;
+//     var size = [this.size/column, this.size/row];
+//     for (var y = 0; y < row; ++y) {
+//         for (var x = 0; x < column; ++x) {
+//             if (letter < text.length) {
+//                 this.ctx.fillText(text[letter], x*size[0]+size[0]/2., (y+1)*size[1]-size[0]/4.);
+//                 letter++;
+//             } else {
+//                 break;
+//             }
+//         }
+//     }
+//     return this.draw();
+// }
+	// uniforms.fontmap = { value: t };
 
 	uniforms.textTexture = { value: makeText.createTexture([{
 		text: 'TEXT',
@@ -102,7 +118,7 @@ export function updateEngine (elapsed) {
 	array = assets.animations.getPosition('Camera', elapsed);
 	engine.camera.position.set(array[0], array[1], array[2]);
 
-	engine.camera.fov = 60 + assets.animations.getPosition('ExtraFOV', elapsed)[1];
+	engine.camera.fov = 60;
 	engine.camera.updateProjectionMatrix();
 
 	array = assets.animations.getPosition('CameraTarget', elapsed);
