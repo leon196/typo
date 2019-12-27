@@ -11,6 +11,10 @@
 			"vertexShader": "shader/mesh/land.vert",
 			"fragmentShader": "shader/color.frag"
 		},
+		"cloud": {
+			"vertexShader": "shader/mesh/cloud.vert",
+			"fragmentShader": "shader/color.frag"
+		},
 		"skybox": {
 			"vertexShader": "shader/mesh/skybox.vert",
 			"fragmentShader": "shader/mesh/skybox.frag",

@@ -19,43 +19,49 @@ void main () {
 	float peak = 4.0;
 	float size = minsize+extrasize*pow(seed.y, peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
-
 	float jitter = 0.01;
 
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension)*2.-1.;
 
-	// float speed = 0.1;
-	// float t = time*speed;
-	// float ratio = mod(t+pos.z, 1.0);
-	// pos.z = -(ratio*2.-1.);
-
 	vec4 terrain = texture2D(terrainmap, pos.xz*.5+.5);
-	float elevation = terrain.x;
 	vec3 normal = normalize(terrain.yzw);
+	float elevation = terrain.x;
+	float shouldGrass = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
+	float shouldWater = smoothstep(0.002, 0.0, elevation);
 
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
 	pos.y = elevation;
 	pos *= range;
 	pos -= normal * weight * .1;
 
+	vec2 pivot = anchor;
+	pivot *= rotation(shouldGrass * sin(time + seed.y*TAU) * (1.-weight)); 
+
 	vec3 right = normalize(cross(normal, vec3(0,1,0)));
 	vec3 up = normalize(cross(right, normal));
-	size *= smoothstep(.5,3.,length(pos-cameraPos));
-	// size *= smoothstep(0.0,0.05,ratio)*smoothstep(1.0,0.95,ratio);
-	pos += (anchor.x * right - anchor.y * up) * size;
+	size *= smoothstep(.1,1.,length(pos-cameraPos));
+	pos += (pivot.x * right - pivot.y * up) * size;
+	
+
+	pos += shouldWater * right * sin(time+seed.y*TAU) * .1;
+	pos.y += shouldWater * sin(time-length(pos.xz)*1.) * .1;
+	pos.y += shouldGrass * sin(time+length(pos.xz)*.5) * .02;
 
 	vColor = vec4(1);
 
-
-	float shadeFertile = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
-	float shadeGrain = seed.z*.2;
+	float shadeGrain = seed.z;
 	vColor.rgb = mix(
 		vec3(0.89, 0.89, 0.60), // light whity ground
 		vec3(0.243, 0.368, 0.133), // dark green ground
-		shadeFertile + shadeGrain);
+		shouldGrass + shadeGrain*.2);
 
-	// global variation
+	vColor.rgb = mix(
+		vColor.rgb, // light whity ground
+		vec3(0.760, 0.960, 0.980), // dark green ground
+		shouldWater + shadeGrain*.1);
+
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
+	vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 
 	vUV = anchor;
 	vNormal = normal;

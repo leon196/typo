@@ -51,9 +51,9 @@ export function initEngine () {
 	});
 	// Geometry.create(Geometry.random(32*32), [8,1])
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
-	// engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	// Geometry.create(Geometry.random(16*16), [8,1])
-	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
+	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
+	Geometry.createCircle(Geometry.random(16*16), 5)
+	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
 	// console.log(TinySDF)
