@@ -15,7 +15,11 @@ void main () {
 	float range = 50.;
 	float radius = pow(quantity.x, 0.5) * range;
 	float angle = seed.x*TAU;
-	float size = .5+2.*pow(seed.y, 2.0);
+	float minsize = 0.5;
+	float extrasize = 1.2;
+	float peak = 4.0;
+	float size = minsize+extrasize*pow(seed.y, peak);
+	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 	float thin = anchor.y*.45+.65;
 	float jitter = 0.02;
 	float t = time*speed;
@@ -34,14 +38,19 @@ void main () {
 	vec3 right = normalize(cross(forward, vec3(0,1,0)));
 	vec3 up = normalize(cross(right, forward));
 	vec2 pivot = anchor;
-	pivot *= rotation(seed.z * TAU);
+	pivot.x = 0.;
+	pivot.y += 1.;
+	pivot *= rotation(-anchor.x*PI);
 	size *= smoothstep(.5,1.,length(pos-cameraPos));
 	size *= smoothstep(0.0,0.1,ratio)*smoothstep(1.0,0.9,ratio);
-	// size *= 1.-fall;
 	pos += (pivot.x*right - pivot.y*up) * size;
+	pos -= forward*size*2.;
 
 	vColor = vec4(1);
-	vColor.a = 0.5;
+	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
+	// vColor.rgb *= 0.75+0.25*(-anchor.y*0.5+0.5);
+	// vColor.a = 0.5;
+
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;

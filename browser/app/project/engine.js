@@ -16,13 +16,14 @@ import { uniforms, initUniforms, updateUniforms, resizeUniforms } from './unifor
 import { clamp, lerp, lerpArray, lerpVector, lerpArray2, lerpVectorArray, saturate } from '../engine/misc';
 
 export var engine = {
-	camera: new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.001, 1000),
+	camera: new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100),
 	target: new THREE.Vector3(),
 	scene: null,
 	sceneedge: null,
 	scenerender: null,
 	controls: null,
 	framebuffer: null,
+	frameterrain: null,
 	frametarget: null,
 	framebloom: null,
 	frameedge: null,
@@ -43,12 +44,12 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
-	Geometry.create(Geometry.random(128*128), [1,1])
+	Geometry.create(Geometry.random(128*128), [8,1])
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.land)));
-	Geometry.create(Geometry.random(128*128), [1,1])
-	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
+	// Geometry.create(Geometry.random(128*128), [1,1])
+	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	Geometry.create(Geometry.random(32*32), [1,1])
+	Geometry.create(Geometry.random(32*32), [5,1])
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
@@ -65,6 +66,11 @@ export function initEngine () {
 	engine.framebuffer = new FrameBuffer({
 		material: assets.shaders.paint
 	});
+	engine.frameterrain = new FrameBuffer({
+		material: assets.shaders.terrain,
+		width: 128,
+		height: 128,
+	});
 
 	engine.sceneedge = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.edge);
 	engine.scenerender = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.render);
@@ -77,6 +83,7 @@ export function initEngine () {
 	uniforms.blur = {value: engine.bloom.blurTarget.texture};
 	uniforms.bloom = {value: engine.bloom.bloomTarget.texture};
 	uniforms.framebuffer = {value: engine.framebuffer.getTexture()};
+	uniforms.terrainmap = {value: engine.frameterrain.getTexture()};
 
 	
 
@@ -135,16 +142,21 @@ export function updateEngine (elapsed) {
 	// engine.camera.lookAt(engine.target);
 
 
+
+	uniforms.terrainmap.value = engine.frameterrain.getTexture();
+	engine.frameterrain.update();
+
 	renderer.clear();
 	renderer.setRenderTarget(engine.frametarget);
 	renderer.render(engine.scene, engine.camera);
-	renderer.setRenderTarget(engine.frameedge);
-	renderer.render(engine.sceneedge, engine.camera);
+	// renderer.setRenderTarget(null);
+	// renderer.setRenderTarget(engine.frameedge);
+	// renderer.render(engine.sceneedge, engine.camera);
 
-	uniforms.framebuffer.value = engine.framebuffer.getTexture();
-	engine.framebuffer.update();
+	// engine.bloom.render(renderer);
 	renderer.setRenderTarget(null);
-	engine.bloom.render(renderer);
+	// uniforms.framebuffer.value = engine.framebuffer.getTexture();
+	// engine.framebuffer.update();
 	renderer.render(engine.scenerender, engine.camera);
 }
 

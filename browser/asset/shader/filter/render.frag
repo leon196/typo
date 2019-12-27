@@ -1,9 +1,8 @@
 
-uniform sampler2D framebuffer, frametarget, frameedge, bloom, blur, textTexture, creditTexture, cookieTexture, jobsTexture;
+uniform sampler2D framebuffer, frametarget, terrainmap;
 uniform vec2 resolution, mouse;
-uniform vec3 Scratch, Texting, Bloom, ExtraBloom, Circle, Circle2, Circle3, TextingScreen, Credits, Cookie, Rideau;
 uniform float time;
-varying vec2 vUv;
+varying vec2 vUV;
 
 float fbm (vec3 p) {
   float amplitude = .5;
@@ -17,11 +16,8 @@ float fbm (vec3 p) {
 
 void main () {
 
-	vec2 uv = vUv;
-	vec4 color = texture2D(framebuffer, uv);
-	vec4 blu = texture2D(blur, uv);
-	vec4 edgy = texture2D(frameedge, uv);
-  // color += smoothstep(0.0,0.3,blu);
-  // color -= edgy;
+	vec2 uv = vUV;
+	vec4 color = texture2D(frametarget, uv);
+  // color.rgb = abs(texture2D(terrainmap, uv).rgb);
 	gl_FragColor = color;
 }

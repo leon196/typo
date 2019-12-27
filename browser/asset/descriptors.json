@@ -13,11 +13,11 @@
 		},
 		"land": {
 			"vertexShader": "shader/mesh/land.vert",
-			"fragmentShader": "shader/circle.frag"
+			"fragmentShader": "shader/color.frag"
 		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",
-			"fragmentShader": "shader/circle.frag"
+			"fragmentShader": "shader/color.frag"
 		},
 		"skybox": {
 			"vertexShader": "shader/mesh/skybox.vert",
@@ -26,7 +26,7 @@
 		},
 		"cloud": {
 			"vertexShader": "shader/mesh/cloud.vert",
-			"fragmentShader": "shader/circle.frag"
+			"fragmentShader": "shader/color.frag"
 		},
 		"text": {
 			"vertexShader": "shader/mesh/text.vert",
@@ -54,6 +54,10 @@
 		"paint": {
 			"vertexShader": "shader/filter/fullscreen.vert",
 			"fragmentShader": "shader/filter/paint.frag"
+		},
+		"terrain": {
+			"vertexShader": "shader/filter/fullscreen.vert",
+			"fragmentShader": "shader/filter/terrain.frag"
 		},
 		"render": {
 			"vertexShader": "shader/filter/fullscreen.vert",
