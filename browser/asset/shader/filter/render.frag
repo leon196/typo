@@ -18,6 +18,6 @@ void main () {
 
 	vec2 uv = vUV;
 	vec4 color = texture2D(frametarget, uv);
-  // color.rgb = abs(texture2D(terrainmap, uv).rgb);
+  // color.rgb = vec3(texture2D(terrainmap, uv).rgb);
 	gl_FragColor = color;
 }

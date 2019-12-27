@@ -3,6 +3,7 @@ uniform sampler2D terrainmap;
 uniform float time;
 
 varying vec2 vUV;
+const float dimension = 128.;
 
 float calculatePath (vec2 pos) {
     float path = 1.0;
@@ -16,14 +17,14 @@ float calculateElevation (vec2 pos) {
 
     // pos.y += time * 0.1;
 
-    float scale = 1.;
-    float cycle = 2.0;
-    float strength = .3;
-    float peak = 1.0;
+    float scale = 2.;
+    float cycle = 1.0;
+    float strength = 1.;
+    float peak = 0.5;
 
     float elevation = 0.;
     float amplitude = 0.5;
-    float falloff = 3.8;
+    float falloff = 4.8;
     const int count = 3;
     for (int i = count; i > 0; --i) {
         elevation += noise(pos * scale / amplitude) * amplitude;
@@ -37,7 +38,7 @@ float calculateElevation (vec2 pos) {
 }
 
 vec3 calculateNormal (vec2 pos) {
-    vec2 e = vec2(0.01, 0);
+    vec2 e = vec2(0.001, 0);
     vec3 north = vec3(pos.x, calculateElevation(pos+e.yx), pos.y+e.x);
     vec3 south = vec3(pos.x, calculateElevation(pos-e.yx), pos.y-e.x);
     vec3 east = vec3(pos.x+e.x, calculateElevation(pos+e.xy), pos.y);
@@ -46,7 +47,7 @@ vec3 calculateNormal (vec2 pos) {
 }
 
 vec3 guessNormal (vec2 uv) {
-    vec2 e = vec2(0.1, 0);
+    vec2 e = vec2(1./dimension, 0);
     vec3 north = vec3(uv.x, texture2D(terrainmap, uv+e.yx).x, uv.y+e.x);
     vec3 south = vec3(uv.x, texture2D(terrainmap, uv-e.yx).x, uv.y-e.x);
     vec3 east = vec3(uv.x+e.x, texture2D(terrainmap, uv+e.xy).x, uv.y);

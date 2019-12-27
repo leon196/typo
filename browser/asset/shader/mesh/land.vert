@@ -21,7 +21,6 @@ void main () {
 	float jitter = 0.01;
 	float dimension = 128.;
 	float t = time*speed;
-	vec2 offset = vec2(0, t*2.);
 
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension)*2.-1.;
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
@@ -33,7 +32,7 @@ void main () {
 	vec3 normal = normalize(terrain.yzw);
 	pos.y = elevation;
 	pos *= range;
-	pos.y -= random(seed.xz)*0.1;
+	// pos.y -= random(seed.xz)*0.1;
 	pos -= normal * weight;
 	// pos.y -= .1/weight;
 	// vec3 normal = normalize(cameraPos-pos);//vec3(0,0,1);//normalize(calculateNormal(pos.xz+offset));
