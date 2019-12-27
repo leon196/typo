@@ -18,7 +18,7 @@ export default class Geometry {
 
 			var vertexCount = count;
 			if (geometryCount > 1) {
-				if (m == geometryCount - 1) count = count % verticesMax;
+				if (m == geometryCount - 1) vertexCount = count % verticesMax;
 				else vertexCount = verticesMax;
 			}
 
@@ -72,6 +72,83 @@ export default class Geometry {
 				geometry.setAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
 			}
 			// geometry.setAttribute( 'indexMap', new THREE.BufferAttribute( new Float32Array(indexMap), 2 ) );
+			geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
+			geometries.push(geometry);
+		}
+		return geometries;
+	}
+
+	static createCircle (attributes, subdivision) {
+		subdivision = subdivision || 3;
+		var count = attributes.position.array.length / attributes.position.itemSize;
+		var geometries = [];
+		var verticesMax = Math.pow(2, 16);
+		var dimension = closestPowerOfTwo(Math.sqrt(count));
+		var geometryCount = 1 + Math.floor(count / verticesMax);
+		var numberIndex = 0;
+		for (var m = 0; m < geometryCount; ++m) {
+
+			var vertexCount = count;
+			if (geometryCount > 1) {
+				if (m == geometryCount - 1) vertexCount = count % verticesMax;
+				else vertexCount = verticesMax;
+			}
+
+			var arrays = {};
+			var anchors = [];
+			var quantities = [];
+			var indices = [];
+			var vIndex = 0;
+			var attributeNames = Object.keys(attributes);
+			attributeNames.forEach(name => { arrays[name] = []; });
+
+			for (var index = 0; index < vertexCount; ++index) {
+				var u = (index % dimension) / dimension;
+				var v = Math.floor(index / dimension) / dimension;
+
+				attributeNames.forEach(name => {
+					var itemSize = attributes[name].itemSize;
+					var array = attributes[name].array;
+					for (var i = 0; i < itemSize; i++) {
+						arrays[name].push(array[index*itemSize+i]);
+					}
+				});
+				anchors.push(0,0);
+				quantities.push(numberIndex / (count-1), numberIndex);
+
+				for (var x = 0; x < subdivision; ++x) {
+					attributeNames.forEach(name => {
+						var itemSize = attributes[name].itemSize;
+						var array = attributes[name].array;
+						for (var i = 0; i < itemSize; i++) {
+							arrays[name].push(array[index*itemSize+i]);
+						}
+					});
+					var angle = Math.PI * 2 * x / subdivision;
+					anchors.push(Math.cos(angle), Math.sin(angle));
+					quantities.push(numberIndex / (count-1), numberIndex);
+				}
+
+				var isub = index*(subdivision+1);
+				for (var x = 0; x < subdivision; ++x) {
+					var c = x+2;
+					if (x+1 == subdivision) c = 1;
+					indices.push(isub, x+1 + isub, c + isub);
+					// vIndex += subdivision+1;
+				}
+				// vIndex += faces[0];
+				numberIndex++;
+			}
+
+			var geometry = new THREE.BufferGeometry();
+			attributeNames.forEach(name => {
+				var array = new Float32Array(arrays[name]);
+				geometry.setAttribute(name, new THREE.BufferAttribute(array, attributes[name].itemSize));
+			});
+			geometry.setAttribute( 'anchor', new THREE.BufferAttribute( new Float32Array(anchors), 2 ) );
+			if (geometry.attributes.quantity == null) {
+				geometry.setAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
+			}
 			geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
 			geometries.push(geometry);
 		}

@@ -44,13 +44,16 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
-	Geometry.create(Geometry.random(128*128), [5,1])
-	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.land)));
+	Geometry.createCircle(Geometry.random(256*256), 5)
+	.forEach(geometry => {
+		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
+		engine.scene.add(mesh);
+	});
 	// Geometry.create(Geometry.random(32*32), [8,1])
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
-	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	Geometry.create(Geometry.random(16*16), [8,1])
-	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
+	// engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
+	// Geometry.create(Geometry.random(16*16), [8,1])
+	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
 	// console.log(TinySDF)
@@ -68,8 +71,8 @@ export function initEngine () {
 	});
 	engine.frameterrain = new FrameBuffer({
 		material: assets.shaders.terrain,
-		width: 128,
-		height: 128,
+		width: 256,
+		height: 256,
 	});
 
 	engine.sceneedge = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.edge);
