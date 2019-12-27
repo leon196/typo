@@ -15,17 +15,18 @@ void main () {
 	float range = 50.;
 	float radius = pow(quantity.x, 0.5) * range;
 	float angle = seed.x*TAU;
-	float size = .1+2.*pow(seed.y, 2.0);
+	float size = .5+2.*pow(seed.y, 2.0);
 	float thin = anchor.y*.45+.65;
 	float jitter = 0.02;
 	float t = time*speed;
-	float dimension = 64.;
+	float dimension = 32.;
+
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension)*2.-1.;
 	pos.xz += vec2(cos(angle), sin(angle)) * jitter;
 	float ratio = mod(t/range+pos.z, 1.0);
 	pos.z = -(ratio*2.-1.);
 	pos *= range;
-	pos.y = 10.0+3.*seed.x;
+	pos.y = 15.0+3.*seed.x;
 	float fall = smoothstep(30.,50.,length(pos.xz));
 	pos.y -= 10.*fall;
 
@@ -40,11 +41,10 @@ void main () {
 	pos += (pivot.x*right - pivot.y*up) * size;
 
 	vColor = vec4(1);
-	vColor.a = 0.2;
+	vColor.a = 0.5;
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1);
-	// gl_Position.z += -.01+seed.z*.001; // z fighting hack fix
 }

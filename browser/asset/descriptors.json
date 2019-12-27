@@ -13,13 +13,11 @@
 		},
 		"land": {
 			"vertexShader": "shader/mesh/land.vert",
-			"fragmentShader": "shader/color.frag",
-			"side": 2
+			"fragmentShader": "shader/circle.frag"
 		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",
-			"fragmentShader": "shader/color.frag",
-			"side": 2
+			"fragmentShader": "shader/circle.frag"
 		},
 		"skybox": {
 			"vertexShader": "shader/mesh/skybox.vert",
@@ -28,7 +26,7 @@
 		},
 		"cloud": {
 			"vertexShader": "shader/mesh/cloud.vert",
-			"fragmentShader": "shader/color.frag"
+			"fragmentShader": "shader/circle.frag"
 		},
 		"text": {
 			"vertexShader": "shader/mesh/text.vert",

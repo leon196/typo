@@ -48,7 +48,7 @@ export function initEngine () {
 	Geometry.create(Geometry.random(128*128), [1,1])
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	Geometry.create(Geometry.random(64*64), [1,1])
+	Geometry.create(Geometry.random(32*32), [1,1])
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
