@@ -1,6 +1,6 @@
 
 attribute vec2 anchor, quantity;
-uniform sampler2D terrainmap;
+uniform sampler2D terrainmap, biotopemap;
 uniform vec3 cameraPos, cameraTarget;
 uniform vec2 resolution, terraincell;
 uniform float time;
@@ -33,9 +33,6 @@ void main () {
 	uv /= 2.;
 	uv -= 1./2.;
 	uv += fract(terraincell);
-	// float x = time*.02;
-	// uv.x = mod(x+uv.x, 1.);
-	// pos.x -= mod(x, 1.);
 	uv = uv * 0.5 + 0.5;
 	vec4 terrain = texture2D(terrainmap, uv);
 	vec3 normal = normalize(terrain.yzw);
@@ -45,7 +42,7 @@ void main () {
 	float shouldWater = smoothstep(0.002, 0.0, elevation);
 
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
-	pos.y = elevation*3.;
+	pos.y = elevation*2.;
 	pos *= range;
 	pos -= normal * weight * .1;
 
@@ -75,7 +72,7 @@ void main () {
 		vColor.rgb, // light whity ground
 		vec3(0.760, 0.960, 0.980), // dark green ground
 		shouldWater + shadeGrain*.1);
-
+	// vColor.rgb = texture2D(biotopemap, uv).rgb;
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
 	vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 

@@ -28,14 +28,6 @@ Mouse.onMove = function(event)
 };
 
 Mouse.update = function () {
-  if (Mouse.down) {
-    Mouse.dtx += (Mouse.x-Mouse.lastx)/10.;
-    Mouse.dty += (Mouse.y-Mouse.lasty)/10.;
-  }
-  Mouse.dtx *= 0.95;
-  Mouse.dty *= 0.95;
-  Mouse.lastx = Mouse.x;
-  Mouse.lasty = Mouse.y;
 }
 
 Mouse.onClic = function(event)

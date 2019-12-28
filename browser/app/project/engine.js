@@ -8,6 +8,7 @@ import FrameBuffer from '../engine/framebuffer';
 import parameters from '../engine/parameters';
 import Geometry from '../engine/geometry';
 import Mouse from '../engine/mouse';
+import Keyboard from '../engine/keyboard';
 import assets from '../engine/assets';
 import Bloom from '../libs/bloom/bloom';
 import { AnaglyphEffect } from '../libs/AnaglyphEffect';
@@ -36,10 +37,10 @@ export function initEngine () {
 	engine.camera.position.y = 15.0;
 	engine.camera.position.z = -15.;
 	engine.camera.lookAt(engine.target);
-	// engine.controls = new OrbitControls(engine.camera, renderer.domElement);
-	// engine.controls.enableDamping = true;
-	// engine.controls.dampingFactor = 0.1;
-	// engine.controls.rotateSpeed = 0.1;
+	engine.controls = new OrbitControls(engine.camera, renderer.domElement);
+	engine.controls.enableDamping = true;
+	engine.controls.dampingFactor = 0.1;
+	engine.controls.rotateSpeed = 0.1;
 
 	initUniforms();
 
@@ -49,8 +50,8 @@ export function initEngine () {
 		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
 		engine.scene.add(mesh);
 	});
-	// Geometry.create(Geometry.random(32*32), [8,1])
-	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
+	Geometry.create(Geometry.random(256*256), [1,1])
+	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
 	// Geometry.createCircle(Geometry.random(16*16), 9)
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
@@ -111,7 +112,7 @@ var array = [0,0,0];
 
 export function updateEngine (elapsed) {
 	// elapsed = timeline.getTime();
-	// engine.controls.update();
+	engine.controls.update();
 	var dt = elapsed-engine.lastelapsed;
 	engine.lastelapsed = elapsed;
 
@@ -129,8 +130,18 @@ export function updateEngine (elapsed) {
 	
 	// engine.terraincell[0] = Math.sin(elapsed*.1);
 	// engine.terraincell[1] = elapsed*.05;
+	engine.controls.enabled = !Keyboard.Space.down;
+	if (Keyboard.Space.down) {
+	  if (Mouse.down) {
+	    Mouse.dtx += (Mouse.x-Mouse.lastx)/10.;
+	    Mouse.dty += (Mouse.y-Mouse.lasty)/10.;
+	  }
+	}
 
-	Mouse.update();
+  Mouse.dtx *= 0.95;
+  Mouse.dty *= 0.95;
+  Mouse.lastx = Mouse.x;
+  Mouse.lasty = Mouse.y;
 
 	engine.terraincell[0] += dt*Mouse.dtx/3.;
 	engine.terraincell[1] += dt*Mouse.dty/3.;
