@@ -33,14 +33,14 @@ float calculateElevation (vec2 pos) {
 
     pos += terraincellID*.333;
 
-    float scale = 1.;
-    float cycle = 4.0;
+    float scale = 2.;
+    float cycle = 2.0;
     float strength = .1;
-    float peak = 1.0;
+    float peak = 1.;
 
     float elevation = 0.;
     float amplitude = 0.5;
-    float falloff = 4.8;
+    float falloff = 3.8;
     const int count = 3;
     for (int i = count; i > 0; --i) {
         elevation += noise(pos * scale / amplitude) * amplitude;
@@ -48,7 +48,8 @@ float calculateElevation (vec2 pos) {
     }
     // elevation += noise(pos*scale);
     elevation = sin(elevation * PI * cycle);
-    elevation = 1.-pow(abs(elevation), peak);
+    elevation = abs(elevation);
+    elevation = 1.-pow(elevation, peak);
     // elevation = .1+.8*smoothstep(0.5,0.9,sin(pos.x*TAU+PI));
     // elevation *= .1+.9*(1.-calculatePath(pos));
     // elevation *= 0.1+0.9*smoothstep(0.0,0.3,abs(uv.x-.5));

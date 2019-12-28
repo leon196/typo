@@ -107,6 +107,9 @@ export function initEngine () {
 
 	Object.keys(assets.shaders).forEach(key => assets.shaders[key].uniforms = uniforms);
 	timeline.start();
+	
+	engine.frameterrain.update();
+	uniforms.terrainmap.value = engine.frameterrain.getTexture();
 }
 
 var array = [0,0,0];
@@ -126,7 +129,7 @@ export function updateEngine (elapsed) {
 	// engine.target.set(array[0], array[1], array[2]);
 	// engine.camera.lookAt(engine.target);
 	engine.terraincell[0] = Math.sin(elapsed*.1);
-	engine.terraincell[1] = elapsed*.1;
+	engine.terraincell[1] = elapsed*.05;
 	// engine.terraincell[1] = Math.sin(elapsed*.1);
 	var currentID = [
 		Math.floor(engine.terraincell[0]),
@@ -142,6 +145,8 @@ export function updateEngine (elapsed) {
 	uniforms.terraincell.value[1] = engine.terraincell[1];
 	uniforms.terraincellID.value[0] = Math.floor(engine.terraincell[0]);
 	uniforms.terraincellID.value[1] = Math.floor(engine.terraincell[1]);
+
+	// shouldUpdateTerrain = true;
 
 	if (shouldUpdateTerrain) {
 		engine.frameterrain.update();

@@ -21,7 +21,9 @@ void main () {
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 	float jitter = 0.01;
 
-	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension)*2.-1.;
+	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension);
+	
+	pos.xz = mod(pos.xz-terraincell, 1.)*2.-1.;
 
 	vec2 uv = pos.xz;
 	uv /= 3.;
