@@ -32,9 +32,9 @@ export var engine = {
 
 export function initEngine () {
 
-	engine.camera.position.x = 1.;
-	engine.camera.position.y = 10.;
-	engine.camera.position.z = -15.0;
+	engine.camera.position.x = .1;
+	engine.camera.position.y = 15.0;
+	engine.camera.position.z = -15.;
 	engine.camera.lookAt(engine.target);
 	// engine.controls = new OrbitControls(engine.camera, renderer.domElement);
 	// engine.controls.enableDamping = true;
@@ -68,13 +68,13 @@ export function initEngine () {
 	});
 	engine.frameterrain = new FrameBuffer({
 		material: assets.shaders.terrain,
-		width: 256*3,
-		height: 256*3,
+		width: 256*2,
+		height: 256*2,
 	});
 	engine.framebiotope = new FrameBuffer({
 		material: assets.shaders.biotope,
-		width: 256*3,
-		height: 256*3,
+		width: 256*2,
+		height: 256*2,
 	});
 
 	engine.scenerender = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.render);
@@ -167,8 +167,8 @@ export function updateEngine (elapsed) {
 
 function updateTerrain () {
 	engine.frameterrain.update();
-	engine.framebiotope.update();
 	uniforms.terrainmap.value = engine.frameterrain.getTexture();
+	engine.framebiotope.update();
 	uniforms.biotopemap.value = engine.framebiotope.getTexture();
 }
 

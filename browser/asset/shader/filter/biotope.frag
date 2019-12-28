@@ -4,7 +4,7 @@ uniform float time;
 uniform vec2 terraincell, terraincellID;
 
 varying vec2 vUV;
-const float dimension = 256.*3.;
+const float dimension = 256.*2.;
 
 vec3 moda (vec2 p, float count) {
     float an = TAU/count;

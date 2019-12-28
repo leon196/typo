@@ -30,9 +30,9 @@ void main () {
 	fade *= smoothstep(1.,0.8,abs(pos.z));
 
 	vec2 uv = pos.xz;
-	uv /= 3.;
-	// uv += 1./3.;
-	uv += fract(terraincell)*2./3.;
+	uv /= 2.;
+	uv -= 1./2.;
+	uv += fract(terraincell);
 	// float x = time*.02;
 	// uv.x = mod(x+uv.x, 1.);
 	// pos.x -= mod(x, 1.);

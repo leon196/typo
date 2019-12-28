@@ -4,7 +4,7 @@ uniform float time;
 uniform vec2 terraincell, terraincellID;
 
 varying vec2 vUV;
-const float dimension = 256.*3.;
+const float dimension = 256.*2.;
 
 vec3 moda (vec2 p, float count) {
     float an = TAU/count;
@@ -31,7 +31,7 @@ float calculateElevation (vec2 pos) {
     // pos = moda(p,3.).xy;
     vec2 uv = pos;
 
-    pos += terraincellID/3.;
+    pos += terraincellID/2.;
 
     float scale = 2.;
     float cycle = 2.0;

@@ -22,7 +22,7 @@ void main () {
 
   // biotope
   p = uv;
-  p.y = 1.-p.y;
+  p.x = 1.-p.x;
   p.x *= resolution.x/resolution.y;
   p *= 3.;
   color.rgb = mix(color.rgb, texture2D(biotopemap, p).rgb, step(p.x, 1.0)*step(p.y, 1.0));
@@ -36,15 +36,16 @@ void main () {
   // color.rgb *= mix(1., smoothstep(1.0, 0.5,fract(texture2D(terrainmap, p).r*60.)), step(p.x, 1.0)*step(p.y, 1.0)*step(0.,p.y));
 
   // cell
-  p = uv;
-  p.y = 1.-p.y;
-  p.x *= resolution.x/resolution.y;
-  p *= 3.;
-  p -= 1./3.;
-  p -= fract(terraincell)/3.;
-  color.rgb = mix(color.rgb, vec3(.8), step(abs(length(p)), 0.02));
-  color.rgb = mix(color.rgb, vec3(.8), step(abs(p.y), .5/3.)*step(abs(abs(p.x)-.5/3.), 3./resolution.y));
-  color.rgb = mix(color.rgb, vec3(.8), step(abs(p.x), .5/3.)*step(abs(abs(p.y)-.5/3.), 3./resolution.y));
+  // p = uv;
+  // p.y = 1.-p.y;
+  // p.x *= resolution.x/resolution.y;
+  // p *= 2.;
+  p -= 1./4.;
+  p -= fract(terraincell)/2.;
+  // p -= 1./3.;
+  color.rgb = mix(color.rgb, vec3(1), step(abs(length(p)), 0.02));
+  color.rgb = mix(color.rgb, vec3(1), step(abs(p.y), .5/3.)*step(abs(abs(p.x)-.5/3.), 3./resolution.y));
+  color.rgb = mix(color.rgb, vec3(1), step(abs(p.x), .5/3.)*step(abs(abs(p.y)-.5/3.), 3./resolution.y));
 
 	gl_FragColor = color;
 }
