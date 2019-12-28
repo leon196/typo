@@ -28,15 +28,15 @@ export default class {
 
 	update () {
 		this.swap();
-		renderer.clear();
 		renderer.setRenderTarget(this.getRenderTarget());
+		renderer.clear();
 		renderer.render(this.scene, this.camera);
 		renderer.setRenderTarget(null);
 	}
 
 	record (scene, camera) {
-		renderer.clear();
 		renderer.setRenderTarget(this.getRenderTarget());
+		renderer.clear();
 		renderer.render(scene, camera);
 		renderer.setRenderTarget(null);
 	}

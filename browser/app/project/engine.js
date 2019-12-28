@@ -29,6 +29,7 @@ export var engine = {
 	frameedge: null,
 	anaglyph: null,
 	bloom: null,
+	terraincell: [0,0],
 }
 
 export function initEngine () {
@@ -71,8 +72,8 @@ export function initEngine () {
 	});
 	engine.frameterrain = new FrameBuffer({
 		material: assets.shaders.terrain,
-		width: 256,
-		height: 256,
+		width: 256*3,
+		height: 256*3,
 	});
 
 	engine.sceneedge = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.edge);
@@ -87,27 +88,6 @@ export function initEngine () {
 	uniforms.bloom = {value: engine.bloom.bloomTarget.texture};
 	uniforms.framebuffer = {value: engine.framebuffer.getTexture()};
 	uniforms.terrainmap = {value: engine.frameterrain.getTexture()};
-
-	
-
-// TinySDF.prototype.grid = function (text, column, row) {
-//     this.ctx.clearRect(0, 0, this.size, this.size);
-//     var letter = 0;
-//     var size = [this.size/column, this.size/row];
-//     for (var y = 0; y < row; ++y) {
-//         for (var x = 0; x < column; ++x) {
-//             if (letter < text.length) {
-//                 this.ctx.fillText(text[letter], x*size[0]+size[0]/2., (y+1)*size[1]-size[0]/4.);
-//                 letter++;
-//             } else {
-//                 break;
-//             }
-//         }
-//     }
-//     return this.draw();
-// }
-	// uniforms.fontmap = { value: t };
-
 	uniforms.textTexture = { value: makeText.createTexture([{
 		text: 'TEXT',
 		font: 'kanit',
@@ -122,6 +102,8 @@ export function initEngine () {
 		shadowBlur: 4,
 		offsetY: 10,
 	}]) };;
+	uniforms.terraincell = { value: [0,0] };
+	uniforms.terraincellID = { value: [0,0] };
 
 	Object.keys(assets.shaders).forEach(key => assets.shaders[key].uniforms = uniforms);
 	timeline.start();
@@ -143,11 +125,28 @@ export function updateEngine (elapsed) {
 	// array = assets.animations.getPosition('CameraTarget', elapsed);
 	// engine.target.set(array[0], array[1], array[2]);
 	// engine.camera.lookAt(engine.target);
+	engine.terraincell[0] = Math.sin(elapsed*.1);
+	engine.terraincell[1] = elapsed*.1;
+	// engine.terraincell[1] = Math.sin(elapsed*.1);
+	var currentID = [
+		Math.floor(engine.terraincell[0]),
+		Math.floor(engine.terraincell[1])
+	]
+	var lastID = [
+		Math.floor(uniforms.terraincell.value[0]),
+		Math.floor(uniforms.terraincell.value[1])
+	]
+	var shouldUpdateTerrain = currentID[0] != lastID[0]
+		|| currentID[1] != lastID[1];
+	uniforms.terraincell.value[0] = engine.terraincell[0];
+	uniforms.terraincell.value[1] = engine.terraincell[1];
+	uniforms.terraincellID.value[0] = Math.floor(engine.terraincell[0]);
+	uniforms.terraincellID.value[1] = Math.floor(engine.terraincell[1]);
 
-
-
-	uniforms.terrainmap.value = engine.frameterrain.getTexture();
-	engine.frameterrain.update();
+	if (shouldUpdateTerrain) {
+		engine.frameterrain.update();
+		uniforms.terrainmap.value = engine.frameterrain.getTexture();
+	}
 
 	renderer.clear();
 	renderer.setRenderTarget(engine.frametarget);

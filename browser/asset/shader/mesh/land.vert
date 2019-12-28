@@ -2,7 +2,7 @@
 attribute vec2 anchor, quantity;
 uniform sampler2D terrainmap;
 uniform vec3 cameraPos, cameraTarget;
-uniform vec2 resolution;
+uniform vec2 resolution, terraincell;
 uniform float time;
 varying vec2 vUV;
 varying vec4 vColor;
@@ -23,14 +23,23 @@ void main () {
 
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension)*2.-1.;
 
-	vec4 terrain = texture2D(terrainmap, pos.xz*.5+.5);
+	vec2 uv = pos.xz;
+	uv /= 3.;
+	// uv += 1./3.;
+	uv += fract(terraincell)*2./3.;
+	// float x = time*.02;
+	// uv.x = mod(x+uv.x, 1.);
+	// pos.x -= mod(x, 1.);
+	uv = uv * 0.5 + 0.5;
+	vec4 terrain = texture2D(terrainmap, uv);
 	vec3 normal = normalize(terrain.yzw);
+	// normal.y *= 3.;
 	float elevation = terrain.x;
 	float shouldGrass = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
 	float shouldWater = smoothstep(0.002, 0.0, elevation);
 
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
-	pos.y = elevation;
+	pos.y = elevation*3.;
 	pos *= range;
 	pos -= normal * weight * .1;
 
