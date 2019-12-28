@@ -27,22 +27,6 @@
 			"depthTest": false,
 			"transparent": true
 		},
-		"bright": {
-			"vertexShader": "shader/filter/bloom/bright.vert",
-			"fragmentShader": "shader/filter/bloom/bright.frag"
-		},
-		"gaussian_blur": {
-			"vertexShader": "shader/filter/bloom/gaussian_blur.vert",
-			"fragmentShader": "shader/filter/bloom/gaussian_blur.frag"
-		},
-		"bloom": {
-			"vertexShader": "shader/filter/bloom/bloom.vert",
-			"fragmentShader": "shader/filter/bloom/bloom.frag"
-		},
-		"edge": {
-			"vertexShader": "shader/filter/fullscreen.vert",
-			"fragmentShader": "shader/filter/edge.frag"
-		},
 		"paint": {
 			"vertexShader": "shader/filter/fullscreen.vert",
 			"fragmentShader": "shader/filter/paint.frag"
@@ -50,6 +34,10 @@
 		"terrain": {
 			"vertexShader": "shader/filter/fullscreen.vert",
 			"fragmentShader": "shader/filter/terrain.frag"
+		},
+		"biotope": {
+			"vertexShader": "shader/filter/fullscreen.vert",
+			"fragmentShader": "shader/filter/biotope.frag"
 		},
 		"render": {
 			"vertexShader": "shader/filter/fullscreen.vert",

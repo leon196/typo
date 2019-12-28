@@ -19,24 +19,20 @@ export var engine = {
 	camera: new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 200),
 	target: new THREE.Vector3(),
 	scene: null,
-	sceneedge: null,
 	scenerender: null,
 	controls: null,
 	framebuffer: null,
 	frameterrain: null,
+	framebiotope: null,
 	frametarget: null,
-	framebloom: null,
-	frameedge: null,
-	anaglyph: null,
-	bloom: null,
 	terraincell: [0,0],
 }
 
 export function initEngine () {
 
 	engine.camera.position.x = 0.02;
-	engine.camera.position.y = -0.05;
-	engine.camera.position.z = 2.0;
+	engine.camera.position.y = 4.;
+	engine.camera.position.z = 8.0;
 	engine.controls = new OrbitControls(engine.camera, renderer.domElement);
 	engine.controls.enableDamping = true;
 	engine.controls.dampingFactor = 0.1;
@@ -64,9 +60,6 @@ export function initEngine () {
 	var h = window.innerHeight;
 	var options = { format: THREE.RGBAFormat, type: THREE.FloatType };
 	engine.frametarget = new THREE.WebGLRenderTarget(w, h, options);
-	engine.framebloom = new THREE.WebGLRenderTarget(w, h, options);
-	engine.frameedge = new THREE.WebGLRenderTarget(w, h, options);
-	engine.bloom = new Bloom(engine.frameedge.texture);
 	engine.framebuffer = new FrameBuffer({
 		material: assets.shaders.paint
 	});
@@ -75,41 +68,43 @@ export function initEngine () {
 		width: 256*3,
 		height: 256*3,
 	});
+	engine.framebiotope = new FrameBuffer({
+		material: assets.shaders.biotope,
+		width: 256*3,
+		height: 256*3,
+	});
 
-	engine.sceneedge = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.edge);
 	engine.scenerender = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.render);
-	engine.sceneedge.frustumCulled = false;
 	engine.scenerender.frustumCulled = false;
 
-	uniforms.frametarget = {value: engine.frametarget.texture};
-	uniforms.frameedge = {value: engine.frameedge.texture};
-	uniforms.framebloom = {value: engine.framebloom.texture};
-	uniforms.blur = {value: engine.bloom.blurTarget.texture};
-	uniforms.bloom = {value: engine.bloom.bloomTarget.texture};
-	uniforms.framebuffer = {value: engine.framebuffer.getTexture()};
-	uniforms.terrainmap = {value: engine.frameterrain.getTexture()};
-	uniforms.textTexture = { value: makeText.createTexture([{
-		text: 'TEXT',
-		font: 'kanit',
-		textAlign: 'center',
-		fontSize: 196,
-		fillStyle: 'white',
-		textAlign: 'center',
-		textBaseline: 'middle',
-		width: 1024,
-		height: 1024,
-		shadowColor: 'rgba(0,0,0,.5)',
-		shadowBlur: 4,
-		offsetY: 10,
-	}]) };;
+	uniforms.frametarget = { value: engine.frametarget.texture };
+	uniforms.framebuffer = { value: 0 };
+	uniforms.terrainmap = { value: 0 };
+	uniforms.biotopemap = { value: 0 };
 	uniforms.terraincell = { value: [0,0] };
 	uniforms.terraincellID = { value: [0,0] };
+	// uniforms.textTexture = { value: makeText.createTexture([{
+	// 	text: 'TEXT',
+	// 	font: 'kanit',
+	// 	textAlign: 'center',
+	// 	fontSize: 196,
+	// 	fillStyle: 'white',
+	// 	textAlign: 'center',
+	// 	textBaseline: 'middle',
+	// 	width: 1024,
+	// 	height: 1024,
+	// 	shadowColor: 'rgba(0,0,0,.5)',
+	// 	shadowBlur: 4,
+	// 	offsetY: 10,
+	// }]) };;
 
 	Object.keys(assets.shaders).forEach(key => assets.shaders[key].uniforms = uniforms);
 	timeline.start();
 
 	engine.frameterrain.update();
+	engine.framebiotope.update();
 	uniforms.terrainmap.value = engine.frameterrain.getTexture();
+	uniforms.biotopemap.value = engine.framebiotope.getTexture();
 }
 
 var array = [0,0,0];
@@ -156,11 +151,6 @@ export function updateEngine (elapsed) {
 	renderer.clear();
 	renderer.setRenderTarget(engine.frametarget);
 	renderer.render(engine.scene, engine.camera);
-	// renderer.setRenderTarget(null);
-	// renderer.setRenderTarget(engine.frameedge);
-	// renderer.render(engine.sceneedge, engine.camera);
-
-	// engine.bloom.render(renderer);
 	renderer.setRenderTarget(null);
 	// uniforms.framebuffer.value = engine.framebuffer.getTexture();
 	// engine.framebuffer.update();
@@ -173,8 +163,6 @@ export function resizeEngine (width, height)
 	engine.camera.aspect = width/height;
 	engine.camera.updateProjectionMatrix();
 	engine.frametarget.setSize(width, height);
-	engine.framebloom.setSize(width, height);
-	engine.frameedge.setSize(width, height);
 	engine.framebuffer.setSize(width, height);
 
 	resizeUniforms(width, height);
