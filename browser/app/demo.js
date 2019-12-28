@@ -11,6 +11,8 @@ export default function() {
 		onWindowResize();
 		window.addEventListener('resize', onWindowResize, false);
 		window.addEventListener('mousemove', Mouse.onMove, false);
+		window.addEventListener('mousedown', Mouse.onClic, false);
+		window.addEventListener('mouseup', Mouse.onMouseUp, false);
 		requestAnimationFrame(animate);
 	});
 

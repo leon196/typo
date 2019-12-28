@@ -3,6 +3,10 @@ var Mouse = {};
 
 Mouse.x = 0;
 Mouse.y = 0;
+Mouse.dtx = 0;
+Mouse.dty = 0;
+Mouse.lastx = 0;
+Mouse.lasty = 0;
 Mouse.down = false;
 
 // Pan
@@ -14,14 +18,25 @@ Mouse.panStarted = false;
 
 Mouse.onMove = function(event)
 {
-	Mouse.x = event.clientX;
-	Mouse.y = event.clientY;
+  Mouse.x = event.clientX;
+  Mouse.y = event.clientY;
   if (Mouse.panStarted)
   {
     Mouse.panX = Mouse.x - Mouse.panStartX;
     Mouse.panY = Mouse.y - Mouse.panStartY;
   }
 };
+
+Mouse.update = function () {
+  if (Mouse.down) {
+    Mouse.dtx += (Mouse.x-Mouse.lastx)/10.;
+    Mouse.dty += (Mouse.y-Mouse.lasty)/10.;
+  }
+  Mouse.dtx *= 0.95;
+  Mouse.dty *= 0.95;
+  Mouse.lastx = Mouse.x;
+  Mouse.lasty = Mouse.y;
+}
 
 Mouse.onClic = function(event)
 {

@@ -7,6 +7,7 @@ import renderer from '../engine/renderer';
 import FrameBuffer from '../engine/framebuffer';
 import parameters from '../engine/parameters';
 import Geometry from '../engine/geometry';
+import Mouse from '../engine/mouse';
 import assets from '../engine/assets';
 import Bloom from '../libs/bloom/bloom';
 import { AnaglyphEffect } from '../libs/AnaglyphEffect';
@@ -16,7 +17,7 @@ import { uniforms, initUniforms, updateUniforms, resizeUniforms } from './unifor
 import { clamp, lerp, lerpArray, lerpVector, lerpArray2, lerpVectorArray, saturate } from '../engine/misc';
 
 export var engine = {
-	camera: new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 200),
+	camera: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 200),
 	target: new THREE.Vector3(),
 	scene: null,
 	scenerender: null,
@@ -26,17 +27,19 @@ export var engine = {
 	framebiotope: null,
 	frametarget: null,
 	terraincell: [0,0],
+	lastelapsed: 0,
 }
 
 export function initEngine () {
 
-	engine.camera.position.x = 0.02;
-	engine.camera.position.y = 4.;
-	engine.camera.position.z = 8.0;
-	engine.controls = new OrbitControls(engine.camera, renderer.domElement);
-	engine.controls.enableDamping = true;
-	engine.controls.dampingFactor = 0.1;
-	engine.controls.rotateSpeed = 0.1;
+	engine.camera.position.x = 1.;
+	engine.camera.position.y = 10.;
+	engine.camera.position.z = -15.0;
+	engine.camera.lookAt(engine.target);
+	// engine.controls = new OrbitControls(engine.camera, renderer.domElement);
+	// engine.controls.enableDamping = true;
+	// engine.controls.dampingFactor = 0.1;
+	// engine.controls.rotateSpeed = 0.1;
 
 	initUniforms();
 
@@ -49,8 +52,8 @@ export function initEngine () {
 	// Geometry.create(Geometry.random(32*32), [8,1])
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	Geometry.createCircle(Geometry.random(16*16), 9)
-	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
+	// Geometry.createCircle(Geometry.random(16*16), 9)
+	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
 	// console.log(TinySDF)
@@ -101,17 +104,17 @@ export function initEngine () {
 	Object.keys(assets.shaders).forEach(key => assets.shaders[key].uniforms = uniforms);
 	timeline.start();
 
-	engine.frameterrain.update();
-	engine.framebiotope.update();
-	uniforms.terrainmap.value = engine.frameterrain.getTexture();
-	uniforms.biotopemap.value = engine.framebiotope.getTexture();
+	updateTerrain();
 }
 
 var array = [0,0,0];
 
 export function updateEngine (elapsed) {
 	// elapsed = timeline.getTime();
-	engine.controls.update();
+	// engine.controls.update();
+	var dt = elapsed-engine.lastelapsed;
+	engine.lastelapsed = elapsed;
+
 	updateUniforms(elapsed);
 
 	// array = assets.animations.getPosition('Camera', elapsed);
@@ -123,9 +126,15 @@ export function updateEngine (elapsed) {
 	// array = assets.animations.getPosition('CameraTarget', elapsed);
 	// engine.target.set(array[0], array[1], array[2]);
 	// engine.camera.lookAt(engine.target);
-	engine.terraincell[0] = Math.sin(elapsed*.1);
-	engine.terraincell[1] = elapsed*.05;
-	// engine.terraincell[1] = Math.sin(elapsed*.1);
+	
+	// engine.terraincell[0] = Math.sin(elapsed*.1);
+	// engine.terraincell[1] = elapsed*.05;
+
+	Mouse.update();
+
+	engine.terraincell[0] += dt*Mouse.dtx/3.;
+	engine.terraincell[1] += dt*Mouse.dty/3.;
+
 	var currentID = [
 		Math.floor(engine.terraincell[0]),
 		Math.floor(engine.terraincell[1])
@@ -144,8 +153,7 @@ export function updateEngine (elapsed) {
 	// shouldUpdateTerrain = true;
 
 	if (shouldUpdateTerrain) {
-		engine.frameterrain.update();
-		uniforms.terrainmap.value = engine.frameterrain.getTexture();
+		updateTerrain();
 	}
 
 	renderer.clear();
@@ -155,6 +163,13 @@ export function updateEngine (elapsed) {
 	// uniforms.framebuffer.value = engine.framebuffer.getTexture();
 	// engine.framebuffer.update();
 	renderer.render(engine.scenerender, engine.camera);
+}
+
+function updateTerrain () {
+	engine.frameterrain.update();
+	engine.framebiotope.update();
+	uniforms.terrainmap.value = engine.frameterrain.getTexture();
+	uniforms.biotopemap.value = engine.framebiotope.getTexture();
 }
 
 export function resizeEngine (width, height)

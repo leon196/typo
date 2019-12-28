@@ -1,5 +1,5 @@
 
-uniform sampler2D terrainmap;
+uniform sampler2D terrainmap, biotopemap;
 uniform float time;
 uniform vec2 terraincell, terraincellID;
 
@@ -25,7 +25,26 @@ float calculatePath (vec2 pos) {
 
 void main () {
 	vec2 uv = vUV;
-    // vec4 frame = texture2D(terrainmap, uv);
-    // elevation = mix(elevation, frame.x, 0.9);
-	gl_FragColor = vec4(0,0,1,1);
+
+    vec4 terrain = texture2D(terrainmap, uv);
+    vec3 normal = normalize(terrain.yzw);
+    // normal.y *= 3.;
+    float elevation = terrain.x;
+    float shouldGrass = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
+    float shouldWater = smoothstep(0.002, 0.0, elevation);
+    float shadeGrain = random(uv);
+    
+    vec3 color = vec3(1);
+
+    color = mix(
+        vec3(0.89, 0.89, 0.60), // light whity ground
+        vec3(0.243, 0.368, 0.133), // dark green ground
+        shouldGrass + shadeGrain*.2);
+
+    color = mix(
+        color, // light whity ground
+        vec3(0.760, 0.960, 0.980), // dark green ground
+        shouldWater + shadeGrain*.1);
+
+	gl_FragColor = vec4(color,1);
 }
