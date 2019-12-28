@@ -1,7 +1,7 @@
 
 attribute vec2 anchor, quantity;
 uniform vec3 cameraPos, cameraTarget, Points, Scratching, Dust;
-uniform vec2 resolution;
+uniform vec2 resolution, terraincell;
 uniform float time;
 varying vec2 vUV;
 varying vec4 vColor;
@@ -12,11 +12,11 @@ void main () {
 	vec3 seed = position;
 
 	float speed = 0.5;
-	float range = 20.;
+	float range = 10.;
 	float radius = pow(quantity.x, 0.5) * range;
 	float angle = seed.x*TAU;
-	float minsize = 1.;
-	float extrasize = 4.;
+	float minsize = .3;
+	float extrasize = 1.;
 	float peak = 4.0;
 	float size = minsize+extrasize*pow(random(seed.xy), peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
@@ -32,6 +32,11 @@ void main () {
 	pos.xz += vec2(cos(angle), sin(angle)) * jitter;
 	float ratio = mod(t/range+pos.z, 1.0);
 	// pos.z = -(ratio*2.-1.);
+	pos.xz = mod(pos.xz*.5+.5-terraincell, 1.)*2.-1.;
+	float fade = 1.;
+	fade *= smoothstep(1.,0.8,abs(pos.x));
+	fade *= smoothstep(1.,0.8,abs(pos.z));
+
 	pos *= range;
 
 	pos.y = height+heightVariation*random(seed.xz);
@@ -43,12 +48,13 @@ void main () {
 	vec3 up = normalize(cross(right, forward));
 	vec2 pivot = anchor;
 	pivot *= rotation(random(seed.zy)*TAU);
-	size *= smoothstep(.5,1.,length(pos-cameraPos));
+	size *= smoothstep(.5,8.,length(pos-cameraPos));
+	// size *= fade;
 	// size *= 1.+smoothstep(2.,1.,length(pos.xz));
 	// size *= smoothstep(0.0,0.3,ratio)*smoothstep(1.0,0.6,ratio);
 	// size *= smoothstep(height, height+2., pos.y);
 	pos += (pivot.x*right - pivot.y*up) * size;
-	pos -= forward*size*2.;
+	// pos -= forward*size*2.;
 
 	vColor = vec4(1);
 	vColor.rgb = mix(vColor.rgb*.75, vColor.rgb, (weight)*.25+.75);
@@ -58,6 +64,10 @@ void main () {
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;
+
+	vec3 skyColor = vec3(.4,.5,1.);
+	skyColor = mix(skyColor, vec3(0.243, 0.368, 0.133)*.5, smoothstep(0.4,0.6,dot(normalize(vView), vec3(0,1,0))*.5+.5));
+	vColor.rgb = mix(skyColor, vColor.rgb, fade);
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1);
 }

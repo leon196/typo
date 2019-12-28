@@ -16,7 +16,7 @@ import { uniforms, initUniforms, updateUniforms, resizeUniforms } from './unifor
 import { clamp, lerp, lerpArray, lerpVector, lerpArray2, lerpVectorArray, saturate } from '../engine/misc';
 
 export var engine = {
-	camera: new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 100),
+	camera: new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 200),
 	target: new THREE.Vector3(),
 	scene: null,
 	sceneedge: null,
@@ -53,7 +53,7 @@ export function initEngine () {
 	// Geometry.create(Geometry.random(32*32), [8,1])
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	Geometry.createCircle(Geometry.random(16*16), 5)
+	Geometry.createCircle(Geometry.random(16*16), 9)
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
@@ -107,7 +107,7 @@ export function initEngine () {
 
 	Object.keys(assets.shaders).forEach(key => assets.shaders[key].uniforms = uniforms);
 	timeline.start();
-	
+
 	engine.frameterrain.update();
 	uniforms.terrainmap.value = engine.frameterrain.getTexture();
 }

@@ -31,7 +31,7 @@ float calculateElevation (vec2 pos) {
     // pos = moda(p,3.).xy;
     vec2 uv = pos;
 
-    pos += terraincellID*.333;
+    pos += terraincellID/3.;
 
     float scale = 2.;
     float cycle = 2.0;

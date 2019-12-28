@@ -14,16 +14,20 @@ void main () {
 	
 	float dimension = 256.;
 	float range = 10.;
-	float minsize = 0.05;
-	float extrasize = 0.3;
+	float minsize = 0.02;
+	float extrasize = 0.2;
 	float peak = 4.0;
 	float size = minsize+extrasize*pow(seed.y, peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 	float jitter = 0.01;
 
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension);
-	
+
 	pos.xz = mod(pos.xz-terraincell, 1.)*2.-1.;
+
+	float fade = 1.;
+	fade *= smoothstep(1.,0.8,abs(pos.x));
+	fade *= smoothstep(1.,0.8,abs(pos.z));
 
 	vec2 uv = pos.xz;
 	uv /= 3.;
@@ -51,11 +55,12 @@ void main () {
 	vec3 right = normalize(cross(normal, vec3(0,1,0)));
 	vec3 up = normalize(cross(right, normal));
 	size *= smoothstep(.1,1.,length(pos-cameraPos));
+	// size *= fade;
 	pos += (pivot.x * right - pivot.y * up) * size;
 	
 
 	pos += shouldWater * right * sin(time+seed.y*TAU) * .1;
-	pos.y += shouldWater * sin(time-length(pos.xz)*1.) * .1;
+	pos.y += shouldWater * sin(time+length(pos.xz)*.1) * .1;
 	pos.y += shouldGrass * sin(time+length(pos.xz)*.5) * .02;
 
 	vColor = vec4(1);
@@ -77,5 +82,10 @@ void main () {
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos-pos;
+
+	vec3 skyColor = vec3(.4,.5,1.);
+	skyColor = mix(skyColor, vec3(0.243, 0.368, 0.133)*.5, smoothstep(0.4,0.6,dot(normalize(vView), vec3(0,1,0))*.5+.5));
+	vColor.rgb = mix(skyColor, vColor.rgb, fade);
+
 	gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4(pos,1);
 }
