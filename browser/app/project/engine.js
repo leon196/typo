@@ -52,7 +52,13 @@ export function initEngine () {
 		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
-	// Geometry.create(Geometry.random(512*512)).forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
+	Geometry.create(Geometry.random(20*10), [5,10])
+	.forEach(geometry => {
+		var mesh = new THREE.Mesh(geometry, assets.shaders.tree);
+		mesh.frustumCulled = false;
+		engine.scene.add(mesh);
+	});
+	Geometry.create(Geometry.random(512*512)).forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
 	// Geometry.createCircle(Geometry.random(16*16), 9)
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));

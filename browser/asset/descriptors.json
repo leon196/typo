@@ -15,6 +15,10 @@
 			"vertexShader": "shader/mesh/cloud.vert",
 			"fragmentShader": "shader/color.frag"
 		},
+		"tree": {
+			"vertexShader": "shader/mesh/tree.vert",
+			"fragmentShader": "shader/color.frag"
+		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",
 			"fragmentShader": "shader/color.frag",

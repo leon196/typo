@@ -15,7 +15,7 @@ void main () {
 	float dimension = 512.;
 	float range = 10.;
 	float minsize = 0.01;
-	float extrasize = 0.1;
+	float extrasize = 0.2;
 	float peak = 4.0;
 	float size = minsize+extrasize*pow(seed.y, peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
@@ -78,7 +78,6 @@ void main () {
 	// vColor.rgb = texture2D(biotopemap, uv).rgb;
 
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
-	// vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 	vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 
 	vUV = anchor;
