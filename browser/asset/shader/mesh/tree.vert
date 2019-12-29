@@ -2,7 +2,7 @@
 attribute vec2 anchor, quantity;
 uniform sampler2D terrainmap, biotopemap, craftmap;
 uniform vec3 cameraPos, cameraTarget;
-uniform vec2 resolution, terraincell;
+uniform vec2 resolution, terraincell, terraincellID;
 uniform float time;
 varying vec2 vUV;
 varying vec4 vColor;
