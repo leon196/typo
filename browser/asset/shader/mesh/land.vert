@@ -44,7 +44,7 @@ void main () {
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
 	pos.y = elevation*2.;
 	pos *= range;
-	pos -= normal * weight * .1;
+	pos += normal * (1.-weight) * .1;
 
 	vec2 pivot = anchor;
 	pivot *= rotation(shouldGrass * sin(time + seed.y*TAU) * (1.-weight)); 
@@ -57,8 +57,8 @@ void main () {
 	
 
 	pos += shouldWater * right * sin(time+seed.y*TAU) * .1;
-	pos.y += shouldWater * sin(time+length(pos.xz)*.1) * .1;
-	pos.y += shouldGrass * sin(time+length(pos.xz)*.5) * .02;
+	// pos.y += shouldWater * sin(time+length(pos.xz)*.1) * .1;
+	// pos.y += shouldGrass * sin(time+length(pos.xz)*.5) * .02;
 
 	vColor = vec4(1);
 
@@ -74,6 +74,7 @@ void main () {
 		shouldWater + shadeGrain*.1);
 	// vColor.rgb = texture2D(biotopemap, uv).rgb;
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
+	// vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 	vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 
 	vUV = anchor;

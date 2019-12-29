@@ -155,6 +155,65 @@ export default class Geometry {
 		return geometries;
 	}
 
+	static createTri (attributes) {
+		var count = attributes.position.array.length / attributes.position.itemSize;
+		var geometries = [];
+		var verticesMax = Math.pow(2, 16);
+		var dimension = closestPowerOfTwo(Math.sqrt(count));
+		var geometryCount = 1 + Math.floor(count / verticesMax);
+		var numberIndex = 0;
+		for (var m = 0; m < geometryCount; ++m) {
+
+			var vertexCount = count;
+			if (geometryCount > 1) {
+				if (m == geometryCount - 1) vertexCount = count % verticesMax;
+				else vertexCount = verticesMax;
+			}
+
+			var arrays = {};
+			var anchors = [];
+			var quantities = [];
+			var indices = [];
+			var vIndex = 0;
+			var attributeNames = Object.keys(attributes);
+			attributeNames.forEach(name => { arrays[name] = []; });
+
+			for (var index = 0; index < vertexCount; ++index) {
+				var u = (index % dimension) / dimension;
+				var v = Math.floor(index / dimension) / dimension;
+				var isub = index*3;
+
+				for (var x = 0; x < 3; ++x) {
+					attributeNames.forEach(name => {
+						var itemSize = attributes[name].itemSize;
+						var array = attributes[name].array;
+						for (var i = 0; i < itemSize; i++) {
+							arrays[name].push(array[index*itemSize+i]);
+						}
+					});
+					var angle = Math.PI * 2 * x / 3 - Math.PI/2.;
+					anchors.push(Math.cos(angle), Math.sin(angle));
+					quantities.push(numberIndex / (count-1), numberIndex);
+					indices.push(isub, isub+1, isub+2);
+				}
+				numberIndex++;
+			}
+
+			var geometry = new THREE.BufferGeometry();
+			attributeNames.forEach(name => {
+				var array = new Float32Array(arrays[name]);
+				geometry.setAttribute(name, new THREE.BufferAttribute(array, attributes[name].itemSize));
+			});
+			geometry.setAttribute( 'anchor', new THREE.BufferAttribute( new Float32Array(anchors), 2 ) );
+			if (geometry.attributes.quantity == null) {
+				geometry.setAttribute( 'quantity', new THREE.BufferAttribute( new Float32Array(quantities), 2 ) );
+			}
+			geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
+			geometries.push(geometry);
+		}
+		return geometries;
+	}
+
 	static createLine (geometry, subdivisions) {
 		var positions = [];
 		var nexts = [];

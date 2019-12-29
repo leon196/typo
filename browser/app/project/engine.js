@@ -50,7 +50,7 @@ export function initEngine () {
 		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
 		engine.scene.add(mesh);
 	});
-	Geometry.create(Geometry.random(256*256), [1,1])
+	Geometry.create(Geometry.random(512*512))
 	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
 	// Geometry.createCircle(Geometry.random(16*16), 9)

@@ -17,7 +17,8 @@
 		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",
-			"fragmentShader": "shader/color.frag"
+			"fragmentShader": "shader/color.frag",
+			"side": 2
 		},
 		"skybox": {
 			"vertexShader": "shader/mesh/skybox.vert",

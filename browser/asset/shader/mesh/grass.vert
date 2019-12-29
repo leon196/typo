@@ -1,6 +1,6 @@
 
 attribute vec2 anchor, quantity;
-uniform sampler2D terrainmap;
+uniform sampler2D terrainmap, biotopemap;
 uniform vec3 cameraPos, cameraTarget, Points, Scratching, Dust;
 uniform vec2 resolution, terraincell;
 uniform float time;
@@ -22,7 +22,7 @@ void main () {
 	float size = minsize+extrasize*pow(seed.y, peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 
-	float dimension = 256.;
+	float dimension = 512.;
 	float jitter = 0.02;
 	float t = time*speed;
 	float y = anchor.y-1.;
@@ -30,13 +30,11 @@ void main () {
 
 	vec3 pos = vec3(mod(quantity.y,dimension)/dimension,0.,floor(quantity.y/dimension)/dimension);
 
-	pos.xz = mod(pos.xz-terraincell, 1.)*2.-1.;
-	pos.xz *= .3;
+	pos.xz = mod(pos.xz-terraincell, 1.) * 2. - 1.;
 
-	float lod = 100.;
-	pos.xz += floor(100.*cameraPos.xz/range)/lod;
-	// float ratio = mod(t+pos.z, 1.0);
-	// pos.z = -(ratio*2.-1.);
+	float fade = 1.;
+	fade *= smoothstep(1.,0.8,abs(pos.x));
+	fade *= smoothstep(1.,0.8,abs(pos.z));
 
 	vec2 uv = pos.xz;
 	uv /= 2.;
@@ -44,6 +42,7 @@ void main () {
 	uv += fract(terraincell);
 	uv = uv * 0.5 + 0.5;
 	vec4 terrain = texture2D(terrainmap, uv);
+	vec4 biotope = texture2D(biotopemap, uv);
 	float elevation = terrain.x;
 	vec3 normal = normalize(terrain.yzw);
 	float shouldGrass = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
@@ -55,7 +54,7 @@ void main () {
 	// pos.y -= random(seed.xz)*0.1;
 	// pos += normal * size;
 
-	normal = mix(normal, vec3(0,1,0), 0.5);
+	normal = mix(normal, vec3(0,1,0), 0.25);
 
 	vec3 forward = normal;//normalize(cameraPos - pos);
 	vec3 right = normalize(cross(forward, vec3(0,1,0)));
@@ -73,14 +72,19 @@ void main () {
 
 	vColor = vec4(1);
 	// vColor.rgb = vec3(0.364, 0.698, 0.062);
-	vColor.rgb = mix(vec3(0.364, 0.698, 0.062), vec3(0.243, 0.368, 0.133), seed.y*.5+.5);
+	vColor.rgb = mix(vec3(0.364, 0.698, 0.062), vec3(0.243, 0.368, 0.133), seed.y*.5+.5)*1.5;
 	// vColor.rgb *= .5+.5*(1.-(anchor.y*.5+.5));
+	vColor.rgb = mix(biotope.rgb, vColor.rgb, (1.-(anchor.y*.5+.5)));
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
 	// vColor.a = 0.5;
 
 	vUV = anchor;
 	vNormal = normal;
 	vView = cameraPos - pos;
+
+	vec3 skyColor = vec3(.4,.5,1.);
+	skyColor = mix(skyColor, vec3(0.243, 0.368, 0.133)*.5, smoothstep(0.4,0.6,dot(normalize(vView), vec3(0,1,0))*.5+.5));
+	vColor.rgb = mix(skyColor, vColor.rgb, fade);
 
 	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1);
 }
