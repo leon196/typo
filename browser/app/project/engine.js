@@ -26,6 +26,7 @@ export var engine = {
 	framebuffer: null,
 	frameterrain: null,
 	framebiotope: null,
+	framecraft: null,
 	frametarget: null,
 	terraincell: [0,0],
 	lastelapsed: 0,
@@ -45,13 +46,13 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
-	Geometry.createCircle(Geometry.random(256*256), 5)
+	Geometry.createCircle(Geometry.random(512*512), 5)
 	.forEach(geometry => {
 		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
+		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
-	Geometry.create(Geometry.random(512*512))
-	.forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
+	// Geometry.create(Geometry.random(512*512)).forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
 	// Geometry.createCircle(Geometry.random(16*16), 9)
 	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
@@ -67,15 +68,14 @@ export function initEngine () {
 	engine.framebuffer = new FrameBuffer({
 		material: assets.shaders.paint
 	});
-	engine.frameterrain = new FrameBuffer({
+	engine.frameterrain = new FrameBuffer({width: 256*2,height: 256*2,
 		material: assets.shaders.terrain,
-		width: 256*2,
-		height: 256*2,
 	});
-	engine.framebiotope = new FrameBuffer({
+	engine.framebiotope = new FrameBuffer({ width: 256*2,height: 256*2,
 		material: assets.shaders.biotope,
-		width: 256*2,
-		height: 256*2,
+	});
+	engine.framecraft = new FrameBuffer({ width: 256*2,height: 256*2,
+		material: assets.shaders.craft,
 	});
 
 	engine.scenerender = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), assets.shaders.render);
@@ -85,6 +85,7 @@ export function initEngine () {
 	uniforms.framebuffer = { value: 0 };
 	uniforms.terrainmap = { value: 0 };
 	uniforms.biotopemap = { value: 0 };
+	uniforms.craftmap = { value: 0 };
 	uniforms.terraincell = { value: [0,0] };
 	uniforms.terraincellID = { value: [0,0] };
 	// uniforms.textTexture = { value: makeText.createTexture([{
@@ -161,8 +162,6 @@ export function updateEngine (elapsed) {
 	uniforms.terraincellID.value[0] = Math.floor(engine.terraincell[0]);
 	uniforms.terraincellID.value[1] = Math.floor(engine.terraincell[1]);
 
-	// shouldUpdateTerrain = true;
-
 	if (shouldUpdateTerrain) {
 		updateTerrain();
 	}
@@ -181,6 +180,8 @@ function updateTerrain () {
 	uniforms.terrainmap.value = engine.frameterrain.getTexture();
 	engine.framebiotope.update();
 	uniforms.biotopemap.value = engine.framebiotope.getTexture();
+	engine.framecraft.update();
+	uniforms.craftmap.value = engine.framecraft.getTexture();
 }
 
 export function resizeEngine (width, height)

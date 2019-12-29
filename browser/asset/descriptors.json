@@ -44,6 +44,10 @@
 			"vertexShader": "shader/filter/fullscreen.vert",
 			"fragmentShader": "shader/filter/biotope.frag"
 		},
+		"craft": {
+			"vertexShader": "shader/filter/fullscreen.vert",
+			"fragmentShader": "shader/filter/craft.frag"
+		},
 		"render": {
 			"vertexShader": "shader/filter/fullscreen.vert",
 			"fragmentShader": "shader/filter/render.frag"

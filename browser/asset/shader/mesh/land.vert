@@ -1,6 +1,6 @@
 
 attribute vec2 anchor, quantity;
-uniform sampler2D terrainmap, biotopemap;
+uniform sampler2D terrainmap, biotopemap, craftmap;
 uniform vec3 cameraPos, cameraTarget;
 uniform vec2 resolution, terraincell;
 uniform float time;
@@ -12,10 +12,10 @@ void main () {
 
 	vec3 seed = position;
 	
-	float dimension = 256.;
+	float dimension = 512.;
 	float range = 10.;
-	float minsize = 0.02;
-	float extrasize = 0.2;
+	float minsize = 0.01;
+	float extrasize = 0.1;
 	float peak = 4.0;
 	float size = minsize+extrasize*pow(seed.y, peak);
 	float weight = clamp((size-minsize)/extrasize, 0., 1.);
@@ -36,10 +36,12 @@ void main () {
 	uv = uv * 0.5 + 0.5;
 	vec4 terrain = texture2D(terrainmap, uv);
 	vec3 normal = normalize(terrain.yzw);
-	// normal.y *= 3.;
+	vec4 craft = texture2D(craftmap, uv);
 	float elevation = terrain.x;
+	float path = craft.x;
 	float shouldGrass = smoothstep(0.4, 0.9, dot(normal, vec3(0,1,0)));
 	float shouldWater = smoothstep(0.002, 0.0, elevation);
+	float shouldCiment = smoothstep(0.0, 1.0, path);
 
 	pos.xz += vec2(cos(seed.x*TAU), sin(seed.x*TAU)) * jitter;
 	pos.y = elevation*2.;
@@ -49,8 +51,9 @@ void main () {
 	vec2 pivot = anchor;
 	pivot *= rotation(shouldGrass * sin(time + seed.y*TAU) * (1.-weight)); 
 
-	vec3 right = normalize(cross(normal, vec3(0,1,0)));
-	vec3 up = normalize(cross(right, normal));
+	vec3 front = normal;//normalize(cameraPos-pos);
+	vec3 right = normalize(cross(front, vec3(0,1,0)));
+	vec3 up = normalize(cross(right, front));
 	size *= smoothstep(.1,1.,length(pos-cameraPos));
 	// size *= fade;
 	pos += (pivot.x * right - pivot.y * up) * size;
@@ -73,6 +76,7 @@ void main () {
 		vec3(0.760, 0.960, 0.980), // dark green ground
 		shouldWater + shadeGrain*.1);
 	// vColor.rgb = texture2D(biotopemap, uv).rgb;
+
 	vColor.rgb = mix(vColor.rgb, vColor.rgb*.5, weight*.25+.5);
 	// vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
 	vColor.rgb *= 0.9+0.1*(-anchor.y*0.5+0.5);
