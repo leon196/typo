@@ -18,11 +18,12 @@ void main () {
 
 	vec2 uv = vUV;
 	vec4 color = texture2D(frametarget, uv);
+  color.rgb += vec3(1)*fract(color.a);
   vec2 p;
 
   // biotope
   p = uv;
-  p.x = 1.-p.x;
+  // p.x = 1.- p.x;
   p.x *= resolution.x/resolution.y;
   p *= 3.;
   color.rgb = mix(color.rgb, texture2D(biotopemap, p).rgb, step(p.x, 1.0)*step(p.y, 1.0));

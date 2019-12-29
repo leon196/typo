@@ -11,6 +11,14 @@
 			"vertexShader": "shader/mesh/land.vert",
 			"fragmentShader": "shader/color.frag"
 		},
+		"fleck": {
+			"vertexShader": "shader/mesh/fleck.vert",
+			"fragmentShader": "shader/color.frag"
+		},
+		"terrainplane": {
+			"vertexShader": "shader/mesh/terrainplane.vert",
+			"fragmentShader": "shader/mesh/terrainplane.frag"
+		},
 		"cloud": {
 			"vertexShader": "shader/mesh/cloud.vert",
 			"fragmentShader": "shader/color.frag"

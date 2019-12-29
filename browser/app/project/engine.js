@@ -46,12 +46,19 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
+	engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1,128,128), assets.shaders.terrainplane))
 	Geometry.createCircle(Geometry.random(512*512), 5)
 	.forEach(geometry => {
-		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
+		var mesh = new THREE.Mesh(geometry, assets.shaders.fleck);
 		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
+	// Geometry.createCircle(Geometry.random(512*512), 5)
+	// .forEach(geometry => {
+	// 	var mesh = new THREE.Mesh(geometry, assets.shaders.land);
+	// 	mesh.frustumCulled = false;
+	// 	engine.scene.add(mesh);
+	// });
 	// Geometry.create(Geometry.random(512*512)).forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
 	// Geometry.createCircle(Geometry.random(16*16), 9)
@@ -135,7 +142,7 @@ export function updateEngine (elapsed) {
 	if (Keyboard.Space.down) {
 	  if (Mouse.down) {
 	    Mouse.dtx += (Mouse.x-Mouse.lastx)/10.;
-	    Mouse.dty += (Mouse.y-Mouse.lasty)/10.;
+	    Mouse.dty -= (Mouse.y-Mouse.lasty)/10.;
 	  }
 	}
 
@@ -166,12 +173,12 @@ export function updateEngine (elapsed) {
 		updateTerrain();
 	}
 
-	renderer.clear();
 	renderer.setRenderTarget(engine.frametarget);
+	renderer.clear();
 	renderer.render(engine.scene, engine.camera);
 	renderer.setRenderTarget(null);
-	// uniforms.framebuffer.value = engine.framebuffer.getTexture();
-	// engine.framebuffer.update();
+	uniforms.framebuffer.value = engine.framebuffer.getTexture();
+	engine.framebuffer.update();
 	renderer.render(engine.scenerender, engine.camera);
 }
 
