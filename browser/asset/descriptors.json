@@ -17,7 +17,7 @@
 		},
 		"tree": {
 			"vertexShader": "shader/mesh/tree.vert",
-			"fragmentShader": "shader/color.frag"
+			"fragmentShader": "shader/mesh/tree.frag"
 		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",

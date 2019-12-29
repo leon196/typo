@@ -52,7 +52,7 @@ export function initEngine () {
 		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
-	Geometry.create(Geometry.random(20*10), [5,10])
+	Geometry.create(Geometry.random(20*10), [5,20])
 	.forEach(geometry => {
 		var mesh = new THREE.Mesh(geometry, assets.shaders.tree);
 		mesh.frustumCulled = false;
