@@ -1,6 +1,5 @@
 
 var asset = {};
-var uniforms = {};
 
 asset.meshes = {};
 asset.material = {};

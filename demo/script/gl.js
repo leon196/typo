@@ -5,6 +5,8 @@ var gl = document.getElementById('canvas').getContext('webgl');
 var ext = gl.getExtension('OES_texture_float');
 var geometryScreen = twgl.createBufferInfoFromArrays(gl, { position:[-1,-1,0,1,-1,0,-1,1,0,-1,1,0,1,-1,0,1,1,0] });
 
+var uniforms = {};
+
 function drawFrame(shader, frame) {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, frame);
 	gl.clearColor(0,0,0,0);

@@ -4,13 +4,13 @@
 window.onload = function() {
 
 	var camera = m4.identity();
-	var cameraDistance = 2;
+	var cameraDistance = 8;
 	var cameraAngle = [0,0];
-	var fieldOfView = 50;
+	var fieldOfView = 10;
 	var projection = m4.identity();
 
 	var frame = twgl.createFramebufferInfo(gl);
-	var particleTree, particleLiquid;
+	var particles = [];
 	var blur = new Blur();
 	var ready = false;
 
@@ -19,8 +19,9 @@ window.onload = function() {
 	uniforms.fontmap = createFontMap();
 
 	function init () {
-		particleTree = new Particle(createParticlesWithText(treetext));
-		particleLiquid = new Particle(createParticlesWithText(liquidtext));
+		var attributes = createParticlesWithText(textes['moutarde']);
+		for (var i = 0; i < attributes.length; ++i)
+			particles.push(twgl.createBufferInfoFromArrays(gl, attributes[i]));
 		ready = true;
 	}
 
@@ -30,10 +31,10 @@ window.onload = function() {
 		uniforms.time = elapsed;
 
 		mouse.update();
-		if (mouse.clic) {
-			cameraAngle[0] += mouse.delta.x * deltaTime / 4.;
-			cameraAngle[1] += mouse.delta.y * deltaTime / 4.;
-		}
+		// if (mouse.clic) {
+		// 	cameraAngle[0] += mouse.delta.x * deltaTime / 4.;
+		// 	cameraAngle[1] += mouse.delta.y * deltaTime / 4.;
+		// }
 
 		m4.rotateY(m4.translation([0,-.2,0]), cameraAngle[0], camera);
 		m4.rotateX(camera, cameraAngle[1], camera);
@@ -44,10 +45,6 @@ window.onload = function() {
 		if (asset.loaded) {
 			if (!ready) init();
 
-
-			particleTree.update(deltaTime, asset.material['velocity'], asset.material['position']);
-			particleLiquid.update(deltaTime, asset.material['liquidV'], asset.material['liquidP']);
-
 			gl.bindFramebuffer(gl.FRAMEBUFFER, frame.framebuffer);
 			gl.clearColor(0,0,0,1);
 			gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
@@ -55,21 +52,8 @@ window.onload = function() {
 	  	gl.enable(gl.BLEND);
 			gl.blendFunc(gl.ONE, gl.ONE);
 			gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-			// uniforms.positionmap = particleTree.uniforms.positionmap;
-			// uniforms.velocitymap = particleTree.uniforms.velocitymap;
-			// uniforms.datamap = particleTree.uniforms.datamap;
-			// particleTree.draw(asset.material['letter']);
-
-			gl.depthMask(true);
-	  	gl.enable(gl.DEPTH_TEST);
-	  	gl.disable(gl.BLEND);
-			uniforms.positionmap = particleLiquid.uniforms.positionmap;
-			uniforms.velocitymap = particleLiquid.uniforms.velocitymap;
-			uniforms.datamap = particleLiquid.uniforms.datamap;
-			uniforms.size = particleLiquid.size;
-			uniforms.dimension = particleLiquid.dimension;
-			particleLiquid.draw(asset.material['liquidS']);
+			for (var i = 0; i < particles.length; ++i)
+				draw(asset.material['letter'], particles[i], gl.TRIANGLES);
 
 			blur.update(frame);
 			uniforms.frame = frame.attachments[0];

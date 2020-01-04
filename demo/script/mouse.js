@@ -53,7 +53,7 @@ mouse.onwheel = function(event)
   }
 };
 
-var canvas = document.getElementById('body');
+var canvas = document.getElementById('canvas');
 canvas.addEventListener('mousemove', mouse.onmove, false);
 canvas.addEventListener('mousedown', mouse.onmousedown, false);
 canvas.addEventListener('mouseout', mouse.onmouseout, false);

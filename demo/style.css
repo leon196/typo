@@ -13,16 +13,33 @@
 body {
   background: black;
   font-family: "Nunito", sans-serif;
-	color:white;
+	color:black;
 }
 
 canvas {
-	position:fixed;
-	left: 0;
-  z-index: -1;
-	top: 0;
-	width: 100vw;
-	height: 100vh;
+  display: inline-block;
+	width: 50%;
+  float: right;
+  height: 100vh;
+}
+
+.text-input {
+  width: 50%;
+  display: inline-block;
+  float: left;
+  height: 100vh;
+  background: white;
+}
+
+input {
+  color: black;
+  width: 98%;
+  height: 98%;
+  margin: 1%;
+}
+
+.button-input {
+  
 }
 
 video, audio

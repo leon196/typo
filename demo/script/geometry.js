@@ -12,7 +12,7 @@ function generateParticles (attributes, subdivisions) {
 
 		var vertexCount = count;
 		if (geometryCount > 1) {
-			if (m == geometryCount - 1) count = count % verticesMax;
+			if (m == geometryCount - 1) vertexCount = count % verticesMax;
 			else vertexCount = verticesMax;
 		}
 
