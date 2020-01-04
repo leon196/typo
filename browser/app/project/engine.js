@@ -21,6 +21,7 @@ export var engine = {
 	camera: new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 200),
 	target: new THREE.Vector3(),
 	scene: null,
+	scenealpha: null,
 	scenerender: null,
 	controls: null,
 	framebuffer: null,
@@ -28,6 +29,7 @@ export var engine = {
 	framebiotope: null,
 	framecraft: null,
 	frametarget: null,
+	framealpha: null,
 	terraincell: [0,0],
 	lastelapsed: 0,
 }
@@ -35,8 +37,8 @@ export var engine = {
 export function initEngine () {
 
 	engine.camera.position.x = .1;
-	engine.camera.position.y = 15.0;
-	engine.camera.position.z = -15.;
+	engine.camera.position.y = 5.0;
+	engine.camera.position.z = -10.;
 	engine.camera.lookAt(engine.target);
 	engine.controls = new OrbitControls(engine.camera, renderer.domElement);
 	engine.controls.enableDamping = true;
@@ -46,28 +48,43 @@ export function initEngine () {
 	initUniforms();
 
 	engine.scene = new THREE.Scene();
+	engine.scenealpha = new THREE.Scene();
+
 	Geometry.createCircle(Geometry.random(512*512), 5)
 	.forEach(geometry => {
 		var mesh = new THREE.Mesh(geometry, assets.shaders.land);
 		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
-	Geometry.create(Geometry.random(20*10), [5,20])
-	.forEach(geometry => {
-		var mesh = new THREE.Mesh(geometry, assets.shaders.tree);
+	// Geometry.create(Geometry.random(20*10), [5,20])
+	// .forEach(geometry => {
+	// 	var mesh = new THREE.Mesh(geometry, assets.shaders.tree);
+	// 	mesh.frustumCulled = false;
+	// 	engine.scene.add(mesh);
+	// });
+	// Geometry.create(Geometry.random(2000), [1,1])
+	// .forEach(geometry => {
+	// 	var mesh = new THREE.Mesh(geometry, assets.shaders.leaf);
+	// 	mesh.frustumCulled = false;
+	// 	engine.scene.add(mesh);
+	// });
+	Geometry.create(Geometry.random(512*512)).forEach(geometry => {
+		var mesh = new THREE.Mesh(geometry, assets.shaders.grass);
 		mesh.frustumCulled = false;
 		engine.scene.add(mesh);
 	});
-	Geometry.createCircle(Geometry.random(128*10), 5)
-	.forEach(geometry => {
-		var mesh = new THREE.Mesh(geometry, assets.shaders.leaf);
+	Geometry.create(Geometry.random(128*128)).forEach(geometry => {
+		var mesh = new THREE.Mesh(geometry, assets.shaders.rain);
 		mesh.frustumCulled = false;
-		engine.scene.add(mesh);
+		engine.scenealpha.add(mesh);
 	});
-	Geometry.create(Geometry.random(512*512)).forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.grass)));
 	engine.scene.add(new THREE.Mesh(new THREE.BoxGeometry(100,100,100), assets.shaders.skybox));
-	// Geometry.createCircle(Geometry.random(16*16), 9)
-	// .forEach(geometry => engine.scene.add(new THREE.Mesh(geometry, assets.shaders.cloud)));
+	Geometry.createCircle(Geometry.random(16*16), 5)
+	.forEach(geometry => {
+		var mesh = new THREE.Mesh(geometry, assets.shaders.cloud);
+		mesh.frustumCulled = false;
+		engine.scenealpha.add(mesh);
+	});
 	// engine.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(1,1), assets.shaders.text))
 
 	// console.log(TinySDF)
@@ -77,6 +94,8 @@ export function initEngine () {
 	var h = window.innerHeight;
 	var options = { format: THREE.RGBAFormat, type: THREE.FloatType };
 	engine.frametarget = new THREE.WebGLRenderTarget(w, h, options);
+	engine.framealpha = new THREE.WebGLRenderTarget(w, h, options);
+
 	engine.framebuffer = new FrameBuffer({
 		material: assets.shaders.paint
 	});
@@ -94,6 +113,7 @@ export function initEngine () {
 	engine.scenerender.frustumCulled = false;
 
 	uniforms.frametarget = { value: engine.frametarget.texture };
+	uniforms.framealpha = { value: engine.framealpha.texture };
 	uniforms.framebuffer = { value: 0 };
 	uniforms.terrainmap = { value: 0 };
 	uniforms.biotopemap = { value: 0 };
@@ -124,10 +144,10 @@ export function initEngine () {
 var array = [0,0,0];
 
 export function updateEngine (elapsed) {
-	// elapsed = timeline.getTime();
 	engine.controls.update();
 	var dt = elapsed-engine.lastelapsed;
 	engine.lastelapsed = elapsed;
+	elapsed = timeline.getTime();
 
 	updateUniforms(elapsed);
 
@@ -178,12 +198,17 @@ export function updateEngine (elapsed) {
 		updateTerrain();
 	}
 
-	renderer.clear();
 	renderer.setRenderTarget(engine.frametarget);
+	renderer.clear();
 	renderer.render(engine.scene, engine.camera);
+
+	renderer.setRenderTarget(engine.framealpha);
+	renderer.clear();
+	renderer.render(engine.scenealpha, engine.camera);
+
 	renderer.setRenderTarget(null);
-	// uniforms.framebuffer.value = engine.framebuffer.getTexture();
-	// engine.framebuffer.update();
+	uniforms.framebuffer.value = engine.framebuffer.getTexture();
+	engine.framebuffer.update();
 	renderer.render(engine.scenerender, engine.camera);
 }
 
@@ -202,6 +227,7 @@ export function resizeEngine (width, height)
 	engine.camera.aspect = width/height;
 	engine.camera.updateProjectionMatrix();
 	engine.frametarget.setSize(width, height);
+	engine.framealpha.setSize(width, height);
 	engine.framebuffer.setSize(width, height);
 
 	resizeUniforms(width, height);

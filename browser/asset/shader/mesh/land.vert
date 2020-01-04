@@ -26,8 +26,8 @@ void main () {
 	pos.xz = mod(pos.xz-terraincell, 1.)*2.-1.;
 
 	float fade = 1.;
-	fade *= smoothstep(1.,0.8,abs(pos.x));
-	fade *= smoothstep(1.,0.8,abs(pos.z));
+	fade *= smoothstep(1.,0.5,abs(pos.x));
+	fade *= smoothstep(1.,0.5,abs(pos.z));
 
 	vec2 uv = pos.xz;
 	uv /= 2.;

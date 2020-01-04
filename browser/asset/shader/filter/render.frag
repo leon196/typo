@@ -1,5 +1,5 @@
 
-uniform sampler2D framebuffer, frametarget, terrainmap, biotopemap, craftmap;
+uniform sampler2D framebuffer, frametarget, framealpha, terrainmap, biotopemap, craftmap;
 uniform vec2 resolution, mouse, terraincell;
 uniform float time;
 varying vec2 vUV;
@@ -19,6 +19,9 @@ void main () {
 	vec2 uv = vUV;
 	vec4 color = texture2D(frametarget, uv);
   vec2 p;
+  
+  color += texture2D(framebuffer, uv);
+
 
   // biotope
   p = uv;
@@ -26,6 +29,7 @@ void main () {
   p.x *= resolution.x/resolution.y;
   p *= 3.;
   color.rgb = mix(color.rgb, texture2D(biotopemap, p).rgb, step(p.x, 1.0)*step(p.y, 1.0));
+
 
   // cell
   p -= 1./4.;

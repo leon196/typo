@@ -1,7 +1,7 @@
 
 attribute vec2 anchor, quantity;
 uniform sampler2D terrainmap, biotopemap;
-uniform vec3 cameraPos, cameraTarget, Points, Scratching, Dust;
+uniform vec3 cameraPos, cameraTarget, Audio;
 uniform vec2 resolution, terraincell;
 uniform float time;
 varying vec2 vUV;
@@ -33,8 +33,9 @@ void main () {
 	pos.xz = mod(pos.xz-terraincell, 1.) * 2. - 1.;
 
 	float fade = 1.;
-	fade *= smoothstep(1.,0.8,abs(pos.x));
-	fade *= smoothstep(1.,0.8,abs(pos.z));
+	fade *= smoothstep(1.,0.5,abs(pos.x));
+	fade *= smoothstep(1.,0.5,abs(pos.z));
+	size *= 1.-Audio.x;
 
 	vec2 uv = pos.xz;
 	uv /= 2.;

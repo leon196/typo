@@ -17,10 +17,8 @@ void main () {
 	float count = 20.;
 	float range = 10.;
 	float minsize = 0.1;
-	float extrasize = 0.1;
+	float extrasize = 0.2;
 	float peak = 2.0;
-	float size = minsize+extrasize*pow(seed.z, peak);
-	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 	float jitter = 0.01;
 	float y = (anchor.y+1.);
 	float thin = 0.04;
@@ -29,7 +27,10 @@ void main () {
 	float i = floor(quantity.x*count)/count;
 	float r = random(vec2(i,0.123));
 	float a = random(vec2(i,8.845))*TAU;
+	// float z = random(vec2(i,3.486));
 	vec2 offset = vec2(cos(a),sin(a))*r;
+	float size = minsize+extrasize*pow(seed.z, peak);
+	float weight = clamp((size-minsize)/extrasize, 0., 1.);
 
 	pos.xz = mod(pos.xz+offset-terraincell, 1. )*2.-1.;
 

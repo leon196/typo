@@ -17,11 +17,15 @@
 		},
 		"cloud": {
 			"vertexShader": "shader/mesh/cloud.vert",
-			"fragmentShader": "shader/color.frag"
+			"fragmentShader": "shader/alpha.frag"
 		},
 		"tree": {
 			"vertexShader": "shader/mesh/tree.vert",
 			"fragmentShader": "shader/mesh/tree.frag"
+		},
+		"rain": {
+			"vertexShader": "shader/mesh/rain.vert",
+			"fragmentShader": "shader/color.frag"
 		},
 		"grass": {
 			"vertexShader": "shader/mesh/grass.vert",
